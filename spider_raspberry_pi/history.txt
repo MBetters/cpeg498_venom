@@ -1,0 +1,151 @@
+    1  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    2  exit
+    3  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    4  exit
+    5  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+    6  exit
+    7  sudo reboot
+    8  ifconfig wlan0 scan > scan.txt
+    9  ifconfig wlan0 up scan > scan.txt
+   10  sudo ifconfig wlan0 up scan > scan.txt
+   11  ifconfifg wlan0 up
+   12  ifconfig wlan0 up
+   13  ifconfig wlan0
+   14  dhclient -v
+   15  sudo dhclient -v
+   16  pciconf -lv
+   17  sudo ifup wlan0
+   18  iwlist wlan0 scan > scan.txt
+   19  nano scan.txt
+   20  sudo ifup wlan0
+   21  if
+   22  ifconfig
+   23  ifconfig ~ more
+   24  ifconfig > more
+   25  more < ifconfig
+   26  more <<< ifconfig
+   27  ifconfig wlan0
+   28  sudo dhclient -v
+   29  sudo dhclient wlan0 -v
+   30  sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+   31  sudo service networking restart
+   32  ifconfig wlan0
+   33  sudo dhclient wlan0 -v
+   34  sudo service networking-manager restart
+   35  sudo shutdown -r now
+   36  exit
+   37  ifconfig wlan0
+   38  ifconfig wlan0 .,l;'`12`32325467800¬!"£$%^&*()_+{}[]#~~@@
+   39  grep inet < ifconfig wlan0 
+   40  grep inet ifconfig wlan0 
+   41  ifconfig eth0
+   42  sudo nano /etc/rc.local
+   43  sudo reboot
+   44  sudo crontab -e
+   45  ifconfig eth0
+   46  ps
+   47  top
+   48  ps -eLf
+   49  crontab -e
+   50  sudo nano crontab -e
+   51  crontab
+   52  crontab -e
+   53  sudo nano /etc/rc.local
+   54  sudo /etc/init.d/launch.sh start
+   55  sudo /etc/init.d/launcher.sh start
+   56  sudo /etc/init.d/launcher.sh stop
+   57  cd Desktop
+   58  python client.py
+   59  cd Desktop
+   60  sudo python client.py
+   61  crontab -e
+   62  cd
+   63  crontab -e
+   64  cd
+   65  crontab
+   66  crontab -l
+   67  crontab -r
+   68  crontab -v
+   69  crontab -i
+   70  crontab il
+   71  crontab -l
+   72  ps -eLf
+   73  sudo nano /ect/rc.local
+   74  sudo nano /etc/init.d/launch.sh
+   75  sudo nano /etc/init.d/launcher.sh
+   76  exit
+   77  cd Desktop
+   78  sudo nano client.py
+   79  sudo usermod -a -G dialout pi
+   80  exit
+   81  ls
+   82  cd Desktop
+   83  ls
+   84  cd
+   85  ls
+   86  cd Documents
+   87  ls
+   88  cd
+   89  cd Desktop
+   90  ls
+   91  cd pyserial-2.7
+   92  ls
+   93  sudo nano client1.py
+   94  cd Desktop
+   95  cd pyserial-2.7
+   96  sudo python client1.py
+   97  sudo nano client.py
+   98  sudo nano client1.py
+   99  ls
+  100  nano client1.py.save
+  101  python client1.py
+  102  sudo nano client1.py
+  103  cd Desktop
+  104  cd pyserial-2.7
+  105  python client1.py
+  106  cd Desktop
+  107  cd pyserial-2.7
+  108  python client1.py
+  109  sudo apt-get update
+  110  sudo reboot
+  111  sudo apt-get update
+  112  sudo reboot
+  113  sudo apt-get update
+  114  sudo apt-get install python-picamera python3-picamera
+  115  sudo apt=get update
+  116  sudo apt-get update
+  117  sudo apt-get upgrade
+  118  df -h
+  119  sudo apt-get upgrade
+  120  cd /home/pi/oldconffiles
+  121  ls
+  122  ls -a
+  123  cat .config
+  124  cd .config
+  125  ls
+  126  cd
+  127  sudo apt-get update
+  128  sudo apt-get upgrade
+  129  sudo apt-get install python-camera python3-picamera
+  130  sudo apt-get install python-picamera python3-picamera
+  131  raspistill -o image.jpg
+  132  sudo shutdown
+  133  history
+  134  raspistill -o image.jpg
+  135  df -h
+  136  ls
+  137  cat image.jpg
+  138  open image.jpg
+  139  ls
+  140  cp image.jpg Desktop
+  141  rm image.jpg
+  142  ls
+  143  cp delete.jpg Desktop
+  144  rm delete.jpg
+  145  cd Desktop
+  146  rm delete.jpg
+  147  cd
+  148  sudo rpi-update
+  149  sudo reboot
+  150  history
+  151  history > hist.txt

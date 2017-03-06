@@ -93,16 +93,13 @@ void loop() {
   analogWrite(BLE, BLENextPWM);
   BLSCurrentPWM = BLSNextPWM;
   BLECurrentPWM = BLENextPWM;
-    
-  else if currentLegIndex == 3 {
-    //Move the back-right leg.
-    BRSNextPWM = getNextPWM(currentAction, "BRS", BRSCurrentPWM);
-    BRENextPWM = getNextPWM(currentAction, "BRE", BRECurrentPWM);
-    analogWrite(BRS, BRSNextPWM);
-    analogWrite(BRE, BRENextPWM);
-    BRSCurrentPWM = BRSNextPWM;
-    BRECurrentPWM = BRENextPWM;
-  }
+  //Move the back-right leg.
+  BRSNextPWM = getNextPWM(currentAction, "BRS", BRSCurrentPWM);
+  BRENextPWM = getNextPWM(currentAction, "BRE", BRECurrentPWM);
+  analogWrite(BRS, BRSNextPWM);
+  analogWrite(BRE, BRENextPWM);
+  BRSCurrentPWM = BRSNextPWM;
+  BRECurrentPWM = BRENextPWM;
   
   //Everything inside the "if (Serial.available()) { ... }" block is 
   //a check for the different inputs.

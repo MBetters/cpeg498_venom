@@ -1,2 +1,6 @@
+Installation Instructions:
 pip install pyserial
+
+Links:
+http://www.ics.com/blog/raspberry-pi-camera-module#.VJFhbyvF-b8
 
