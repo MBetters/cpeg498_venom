@@ -32,6 +32,9 @@ unsigned int BRENextPWM;
 //Possible values: stand still, forward, backward, left, right, turn CW, turn CCW
 String currentAction = "forward";
 
+unsigned int PWMMin = 3277;
+unsigned int PWMMax = 6553;
+
 void setup() {
 
   //Good resource on Teensy PWM capabilities: https://www.pjrc.com/teensy/td_pulse.html
@@ -56,6 +59,7 @@ void setup() {
   //where 0 is 0% duty cycle and 65535 is 100% duty cycle.
   //The servos accept a duty cycle range of 5% to 10%,
   //so analogWrite values should range from 3277 to 6553.
+  //These values are set to PWMMin and PWMMax, respectively.
   analogWriteResolution(16);
 
   //Open a serial communication line with data rate = 9600 bits per second.
@@ -142,5 +146,55 @@ void loop() {
 unsigned int getNextPWM(String currentAction, String servoName, unsigned int currentPWM) {
   //TODO: Implement this function.
   //      It will use sinusoids to compute servo PWM signals
+
+  //Example Code
+  if (currentAction == "forward") {
+    if (servoName == "FLS") {
+      unsigned int currentAngle = asin(currentPWM);
+      return (unsigned int) PWMMax * sin(currentAngle + 0.01);
+    }
+    else if (servoName == "FLE") {
+      //etc.
+    }
+  }
+  else if (currentAction == "backward") {
+    //etc
+  }
+  //etc
+}
+
+//The following variables and function get the next PWM using indices 
+//and an array of PWM values.
+//Notice that the current index variables start out offset from each other.
+//This is because the legs will be at different positions in the PWM values array
+//at any point in time.
+unsigned int FLSCurrentIndex = 0;
+unsigned int FLECurrentIndex = 20;
+unsigned int FRSCurrentIndex = 40;
+unsigned int FRECurrentIndex = 60;
+unsigned int BLSCurrentIndex = 80;
+unsigned int BLECurrentIndex = 100;
+unsigned int BRSCurrentIndex = 120;
+unsigned int BRECurrentIndex = 140;
+unsigned int PWMForwardActionValues[] = {PWMMin + 5, PWMMin + 13, PWMMin + 86}; //this would have LOTS more values
+unsigned int PWMBackwardActionValues[] = {PWMMin + 5, PWMMin + 13, PWMMin + 86}; //this would have LOTS more values
+unsigned int getNextPWMUsingSharedArrays(String currentAction, String servoName, unsigned int currentPWM) {
+  //Uses shared arrays for PWM signals.
+  //TODO: Implement this function.
+
+  //Example Code
+  if (currentAction == "forward") {
+    if (servoName == "FLS") {
+      FLSCurrentIndex = FLSCurrentIndex + 1;
+      return PWMForwardActionValues[FLSCurrentIndex];
+    }
+    else if (servoName == "FLE") {
+      //etc.
+    }
+  }
+  else if (currentAction == "backward") {
+    //etc
+  }
+  //etc
 }
 
