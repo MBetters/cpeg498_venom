@@ -1,12 +1,16 @@
 //These are the pin numbers of the different servos.
 unsigned int FLS = 3; //front-left shoulder pin number
 unsigned int FLE = 4; //front-left elbow pin number
-unsigned int FRS = 5; //front-right shoulder pin number
+unsigned int FRS = 10; //front-right shoulder pin number, tested
 unsigned int FRE = 6; //front-right elbow pin number
 unsigned int BLS = 20; //back-left shoulder pin number
 unsigned int BLE = 21; //back-left elbow pin number
-unsigned int BRS = 22; //back-right shoulder pin number
-unsigned int BRE = 23; //back-right elbow pin number
+unsigned int BRS = 6; //back-right shoulder pin number, tested
+unsigned int BRE = 9; //back-right elbow pin number, tested
+unsigned int MLS = 4; //middle-left shoulder, tested
+unsigned int MLE = 10; //middle-left elbow
+unsigned int MRS = 5; //middle-right shoulder, tested
+unsigned int MRE = 3; //middle-right elbow, tested
 
 //These are the current PWM values of the different servos.
 unsigned int FLSCurrentPWM = 3277;
@@ -35,6 +39,15 @@ String currentAction = "forward";
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
 
+void testPWMPin(unsigned int PWMPin) {
+  unsigned int i = PWMMin;
+  while (i < PWMMax) {
+    analogWrite(PWMPin, i);
+    i = i + 1;
+    delay(1);
+  }
+}
+
 void setup() {
 
   //Good resource on Teensy PWM capabilities: https://www.pjrc.com/teensy/td_pulse.html
@@ -61,6 +74,8 @@ void setup() {
   //so analogWrite values should range from 3277 to 6553.
   //These values are set to PWMMin and PWMMax, respectively.
   analogWriteResolution(16);
+
+  testPWMPin(10);
 
   //Open a serial communication line with data rate = 9600 bits per second.
   //NOTE: The Raspberry Pi sends commands and the Arduino receives them.
