@@ -267,3 +267,39 @@ void loop() {
   //Have a small delay before the next call to loop()
   delay(2);
 }
+
+unsigned int translateBounds(String servo, unsigned int value) {
+  // This function maps input values from 0-1000 to the corresponding ranges for each servo, so they are 
+  // calibrated to each other and none of them goes out of range and damages the robot. 
+  // 0 for elbows means pushed all the way down, and 0 for shoulders means pushed all the way back.
+  // 1000 for elbows means pushed all the way up (legs in the air), and 1000 for shoulders means pushed all the way forward.
+  //
+  // So, moving all elbows down together might look like this:
+  //
+  // unsigned int allElbows = 100; 
+  //
+  // analogWrite(FRE, translateBounds("FRE", allElbows));
+  // analogWrite(FLE, translateBounds("FLE", allElbows));
+  // analogWrite(BRE, translateBounds("BRE", allElbows));
+  // analogWrite(BLE, translateBounds("BLE", allElbows));
+  // analogWrite(MRE, translateBounds("MRE", allElbows));
+  // analogWrite(MLE, translateBounds("MLE", allElbows));
+  
+  int index = -1;
+  String servoNames[12] = {"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
+  for (int i = 0; i < 12; i++) {
+    if (servo == servoNames[i]) {
+      index = i; 
+    }
+  }
+  if (index == -1) {
+    return 0;
+  }
+  unsigned int translationTable[12][2] = {{8300, 2200},{1800, 5400},{2000, 8000},{7750, 3500},{8500, 3800},{1950, 6100},{2000, 6500},{8200, 3700},{8000, 3800},{1750, 5700},{1500, 4500},{8500, 3800}};
+  
+  if (translationTable[index][0] < translationTable[index][1]) {
+    return (unsigned int) ((translationTable[index][1] - translationTable[index][0]) * value / 1000) + translationTable[index][0];
+  } else {
+    return (unsigned int) translationTable[index][0] - ((translationTable[index][0] - translationTable[index][1]) * value / 1000);
+  }
+}
