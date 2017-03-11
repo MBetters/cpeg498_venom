@@ -132,10 +132,10 @@ unsigned int servoID = 0;
 unsigned int PWMValuesIndex = 0;
 unsigned int numberOfPWMValues = sizeof(PWMValues[actionID][servoID]) / sizeof(unsigned int);
 
-void testPWMPin(unsigned int PWMPin) {
+void testPWMPin(unsigned int PWMPinNumber) {
   unsigned int i = PWMMin;
   while (i < PWMMax) {
-    analogWrite(PWMPin, i);
+    analogWrite(PWMPinNumber, i);
     i = i + 1;
     delay(1);
   }
