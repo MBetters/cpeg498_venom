@@ -257,11 +257,12 @@ void loop() {
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
     analogWrite(servoPinNumber, PWMValue);
-    //Make sure the PWMValuesIndex doesn't go past the end of the array of PWM values
-    PWMValuesIndex %= numberOfPWMValues;
   }
 
+  //Increment PWMValuesIndex
   PWMValuesIndex++;
+  //Make sure the PWMValuesIndex doesn't go past the end of the array of PWM values
+  PWMValuesIndex %= numberOfPWMValues;
   
   //Have a small delay before the next call to loop()
   delay(2);
