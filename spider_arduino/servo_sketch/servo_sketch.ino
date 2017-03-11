@@ -21,9 +21,6 @@ unsigned int servoPinNumbers[] = {FLS, FLE,
                                   MLS, MLE,
                                   MRS, MRE};
 
-//This variable is the ID of the current action.
-unsigned int actionID = 0;
-
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
 
@@ -130,6 +127,7 @@ unsigned int PWMValues[7][12][3] = { //#actions = 7,
   },
 };
 
+unsigned int actionID = 0;
 unsigned int servoID = 0;
 unsigned int PWMValuesIndex = 0;
 unsigned int numberOfPWMValues = sizeof(PWMValues[actionID][servoID]) / sizeof(unsigned int);
