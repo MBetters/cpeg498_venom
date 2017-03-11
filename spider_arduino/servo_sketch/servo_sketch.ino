@@ -251,8 +251,10 @@ void loop() {
 
   //For every servo, actuate.
   for (servoID = 0; servoID < 12; servoID++) {
-    //Get the PWM value
-    unsigned int PWMValue = PWMValues[actionID][servoID][PWMValuesIndex];
+    //Get the proportional (between 0 and 100) PWM value
+    unsigned int proportionalPWMValue = PWMValues[actionID][servoID][PWMValuesIndex];
+    //Get the actual PWM value
+    unsigned int PWMValue = getActualPWMValue(proportionalPWMValue);
     //Get the servo pin number
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
