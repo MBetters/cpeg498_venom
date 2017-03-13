@@ -1,18 +1,16 @@
 //These are the pin numbers of the different servos.
-//The "tested" addendum means that it has been verified that
-//the pin and servo work.
-unsigned int FLS = 3; //front-left shoulder pin number
-unsigned int FLE = 4; //front-left elbow pin number
-unsigned int FRS = 10; //front-right shoulder pin number, tested
-unsigned int FRE = 6; //front-right elbow pin number
-unsigned int BLS = 20; //back-left shoulder pin number
-unsigned int BLE = 21; //back-left elbow pin number
-unsigned int BRS = 6; //back-right shoulder pin number, tested
-unsigned int BRE = 9; //back-right elbow pin number, tested
-unsigned int MLS = 4; //middle-left shoulder, tested
-unsigned int MLE = 10; //middle-left elbow
-unsigned int MRS = 5; //middle-right shoulder, tested
-unsigned int MRE = 3; //middle-right elbow, tested
+unsigned int FLS = 32; //front-left shoulder pin number
+unsigned int FLE = 21; //front-left elbow pin number
+unsigned int FRS = 10; //front-right shoulder pin number
+unsigned int FRE = 20; //front-right elbow pin number
+unsigned int BLS = 25; //back-left shoulder pin number
+unsigned int BLE = 22; //back-left elbow pin number
+unsigned int BRS = 6; //back-right shoulder pin number
+unsigned int BRE = 9; //back-right elbow pin number
+unsigned int MLS = 4; //middle-left shoulder
+unsigned int MLE = 23; //middle-left elbow
+unsigned int MRS = 5; //middle-right shoulder
+unsigned int MRE = 3; //middle-right elbow
 
 unsigned int servoPinNumbers[] = {FLS, FLE, 
                                   FRS, FRE,
