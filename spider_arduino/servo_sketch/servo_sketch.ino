@@ -266,6 +266,53 @@ void loop() {
   delay(2);
 }
 
+void turnOn() {
+  // Assumes a folded position of elbows at 700, shoulders at 0.
+  for (int i=0; i < 100; i++) {
+    delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
+    analogWrite(FRS, translateBounds("FRS", i * 8));
+    analogWrite(FLS, translateBounds("FLS", i * 8));
+    analogWrite(BRS, translateBounds("BRS", i * 3));
+    analogWrite(BLS, translateBounds("BLS", i * 3));
+    analogWrite(MRS, translateBounds("MRS", i * 6));
+    analogWrite(MLS, translateBounds("MLS", i * 6));
+  }
+  for (int i=700; i > 200; i--) {
+    delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
+    analogWrite(FRE, translateBounds("FRE", i));
+    analogWrite(FLE, translateBounds("FLE", i));
+    analogWrite(BRE, translateBounds("BRE", i));
+    analogWrite(BLE, translateBounds("BLE", i));
+    analogWrite(MRE, translateBounds("MRE", i));
+    analogWrite(MLE, translateBounds("MLE", i));
+  }
+}
+
+void turnOff() {
+  // Assumes a standing position of elbows at 200.
+
+  for (int i=200; i < 700; i++) {
+    delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
+    analogWrite(FRE, translateBounds("FRE", i));
+    analogWrite(FLE, translateBounds("FLE", i));
+    analogWrite(BRE, translateBounds("BRE", i));
+    analogWrite(BLE, translateBounds("BLE", i));
+    analogWrite(MRE, translateBounds("MRE", i));
+    analogWrite(MLE, translateBounds("MLE", i));
+  }
+  for (int i=100; i > 0; i--) {
+    delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
+    analogWrite(FRS, translateBounds("FRS", i * 8));
+    analogWrite(FLS, translateBounds("FLS", i * 8));
+    analogWrite(BRS, translateBounds("BRS", i * 3));
+    analogWrite(BLS, translateBounds("BLS", i * 3));
+    analogWrite(MRS, translateBounds("MRS", i * 6));
+    analogWrite(MLS, translateBounds("MLS", i * 6));
+  }
+  //resetFunc(); //call reset 
+}
+
+
 unsigned int translateBounds(String servo, unsigned int value) {
   // This function maps input values from 0-1000 to the corresponding ranges for each servo, so they are 
   // calibrated to each other and none of them goes out of range and damages the robot. 
@@ -282,7 +329,6 @@ unsigned int translateBounds(String servo, unsigned int value) {
   // analogWrite(BLE, translateBounds("BLE", allElbows));
   // analogWrite(MRE, translateBounds("MRE", allElbows));
   // analogWrite(MLE, translateBounds("MLE", allElbows));
-  
   int index = -1;
   String servoNames[12] = {"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
   for (int i = 0; i < 12; i++) {
@@ -293,7 +339,7 @@ unsigned int translateBounds(String servo, unsigned int value) {
   if (index == -1) {
     return 0;
   }
-  unsigned int translationTable[12][2] = {{8300, 2200},{1800, 5400},{2000, 8000},{7750, 3500},{8500, 3800},{1950, 6100},{2000, 6500},{8200, 3700},{8000, 3800},{1750, 5700},{1500, 4500},{8500, 3800}};
+  unsigned int translationTable[12][2] = {{8600, 2200},{1800, 5500},{1790, 7700},{7750, 2750},{8650, 3800},{1950, 6100},{2000, 6500},{8200, 3700},{8200, 3800},{1750, 5600},{1450, 4500},{8500, 3200}};
   
   if (translationTable[index][0] < translationTable[index][1]) {
     return (unsigned int) ((translationTable[index][1] - translationTable[index][0]) * value / 1000) + translationTable[index][0];
