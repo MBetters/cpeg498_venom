@@ -21,109 +21,27 @@ unsigned int servoPinNumbers[] = {FLS, FLE,
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
-
-unsigned int PWMValues[7][12][3] = { //#actions = 7, 
-                                     //#servos = 12,
-                                     //#PWM values = 3 (this will eventually be much higher)
-  { //stand up
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //move forward
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //move backward
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //sidestep left
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //sidestep right
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //turn CW
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
-  { //turn CCW
-    {1, 3, 7}, //FLS PWM values
-    {1, 3, 7}, //FLE PWM values
-    {1, 3, 7}, //FRS PWM values
-    {1, 3, 7}, //FRE PWM values
-    {1, 3, 7}, //BLS PWM values
-    {1, 3, 7}, //BLE PWM values
-    {1, 3, 7}, //BRS PWM values
-    {1, 3, 7}, //BRE PWM values
-    {1, 3, 7}, //MLS PWM values
-    {1, 3, 7}, //MLE PWM values
-    {1, 3, 7}, //MRS PWM values
-    {1, 3, 7} //MRE PWM values
-  },
+int Stand_Arr_Size = 1;
+// 7 Arrays that are 12x3
+ //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
+unsigned int PWMValues_STAND[12][Stand_Arr_Size]= {
+  {800},
+  {200},
+  {800},
+  {200},
+  {300},
+  {200},
+  {300},
+  {200},
+  {600},
+  {200},
+  {600},
+  {200}
 };
+unsigned int PWMValues_SIT[12][3];
+unsigned int PWMValues_FORWARD[12][3];
+unsigned int PWMValues_BACKWARD[12][3];
+unsigned int index = 0;
 
 unsigned int actionID = 0;
 unsigned int servoID = 0;
@@ -196,12 +114,34 @@ void setup() {
 
   //Run all the tests.
   //Comment this out in production.
-  runTests();
+  //runTests();
+  turnOn();
   
   Serial.println("setup done");
 }
 
 void loop() {
+  
+  if (actionID == 1) {
+    //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
+    analogWrite(FLS, translateBounds("FLS", PWMValues_STAND[0][index]));
+    analogWrite(FRS, translateBounds("FRS", PWMValues_STAND[2][index]));
+    analogWrite(BRS, translateBounds("BRS", PWMValues_STAND[6][index]));
+    analogWrite(BLS, translateBounds("BLS", PWMValues_STAND[4][index]));
+    analogWrite(MRS, translateBounds("MRS", PWMValues_STAND[10][index]));
+    analogWrite(MLS, translateBounds("MLS", PWMValues_STAND[8][index]));
+    analogWrite(FRE, translateBounds("FRE", PWMValues_STAND[3][index]));
+    analogWrite(FLE, translateBounds("FLE", PWMValues_STAND[1][index]));
+    analogWrite(BRE, translateBounds("BRE", PWMValues_STAND[7][index]));
+    analogWrite(BLE, translateBounds("BLE", PWMValues_STAND[5][index]));
+    analogWrite(MRE, translateBounds("MRE", PWMValues_STAND[11][index]));
+    analogWrite(MLE, translateBounds("MLE",PWMValues_STAND[9][index]));
+    index++;
+    }
+
+    if(index == Stand_Arr_Size){
+      
+    }
 
   //Get the current actionID.
   if (Serial.available()) {
@@ -236,6 +176,9 @@ void loop() {
     else if (ch == 'v') {
       Serial.println("Received 'turn CCW' command");
       actionID = 6;
+    }
+    else if(ch == 'x'){
+      turnOff();
     }
     //Reset the PWMValuesIndex to zero.
     PWMValuesIndex = 0;
