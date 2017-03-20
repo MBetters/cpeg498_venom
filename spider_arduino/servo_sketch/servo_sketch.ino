@@ -136,11 +136,10 @@ void loop() {
     analogWrite(BLE, translateBounds("BLE", PWMValues_STAND[5][index]));
     analogWrite(MRE, translateBounds("MRE", PWMValues_STAND[11][index]));
     analogWrite(MLE, translateBounds("MLE",PWMValues_STAND[9][index]));
-    index++;
     }
-
+    index++;
     if(index == Stand_Arr_Size){
-      
+      index = 0;
     }
 
   //Get the current actionID.
