@@ -21,10 +21,10 @@ unsigned int servoPinNumbers[] = {FLS, FLE,
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
-int Stand_Arr_Size = 1;
+unsigned int Stand_Arr_Size = 1;
 // 7 Arrays that are 12x3
  //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
-unsigned int PWMValues_STAND[12][Stand_Arr_Size]= {
+unsigned int PWMValues_STAND[12][1] = {
   {800},
   {200},
   {800},
@@ -38,16 +38,16 @@ unsigned int PWMValues_STAND[12][Stand_Arr_Size]= {
   {600},
   {200}
 };
-unsigned int PWMValues_SIT[12][3];
-unsigned int PWMValues_FORWARD[12][3];
-unsigned int PWMValues_BACKWARD[12][3];
-unsigned int index = 0;
+//unsigned int PWMValues_SIT[12][3];
+//unsigned int PWMValues_FORWARD[12][3];
+//unsigned int PWMValues_BACKWARD[12][3];
+unsigned int servo_index = 0;
 
 unsigned int actionID = 0;
 unsigned int servoID = 0;
 unsigned int PWMValuesIndex = 0;
-unsigned int numberOfPWMValues = sizeof(PWMValues[actionID][servoID]) / sizeof(unsigned int);
-
+//unsigned int numberOfPWMValues = sizeof(PWMValues[actionID][servoID]) / sizeof(unsigned int);
+/*
 void testPWMPin(unsigned int PWMPinNumber) {
   unsigned int i = PWMMin;
   while (i < PWMMax) {
@@ -60,8 +60,8 @@ void testPWMPin(unsigned int PWMPinNumber) {
 void runTests() {
   //This function runs one or more tests.
   testPWMPin(10);
-}
-
+}*/
+/*
 unsigned int getActualPWMValue(unsigned int proportionalPWMValue) {
    //proportionalPWMValue- number from 0 to 100 (silently maxed out at 100)
    if (proportionalPWMValue > 100) {
@@ -70,7 +70,7 @@ unsigned int getActualPWMValue(unsigned int proportionalPWMValue) {
    //output- PWM value between PWMMin and PWMMax depending on proportionalPWMValue
    return PWMMin + (PWMMax - PWMMin) * (proportionalPWMValue / 100);
 }
-
+*/
 void setup() {
 
   //Good resource on Teensy PWM capabilities: https://www.pjrc.com/teensy/td_pulse.html
@@ -124,22 +124,22 @@ void loop() {
   
   if (actionID == 1) {
     //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
-    analogWrite(FLS, translateBounds("FLS", PWMValues_STAND[0][index]));
-    analogWrite(FRS, translateBounds("FRS", PWMValues_STAND[2][index]));
-    analogWrite(BRS, translateBounds("BRS", PWMValues_STAND[6][index]));
-    analogWrite(BLS, translateBounds("BLS", PWMValues_STAND[4][index]));
-    analogWrite(MRS, translateBounds("MRS", PWMValues_STAND[10][index]));
-    analogWrite(MLS, translateBounds("MLS", PWMValues_STAND[8][index]));
-    analogWrite(FRE, translateBounds("FRE", PWMValues_STAND[3][index]));
-    analogWrite(FLE, translateBounds("FLE", PWMValues_STAND[1][index]));
-    analogWrite(BRE, translateBounds("BRE", PWMValues_STAND[7][index]));
-    analogWrite(BLE, translateBounds("BLE", PWMValues_STAND[5][index]));
-    analogWrite(MRE, translateBounds("MRE", PWMValues_STAND[11][index]));
-    analogWrite(MLE, translateBounds("MLE",PWMValues_STAND[9][index]));
+    analogWrite(FLS, translateBounds("FLS", PWMValues_STAND[0][servo_index]));
+    analogWrite(FRS, translateBounds("FRS", PWMValues_STAND[2][servo_index]));
+    analogWrite(BRS, translateBounds("BRS", PWMValues_STAND[6][servo_index]));
+    analogWrite(BLS, translateBounds("BLS", PWMValues_STAND[4][servo_index]));
+    analogWrite(MRS, translateBounds("MRS", PWMValues_STAND[10][servo_index]));
+    analogWrite(MLS, translateBounds("MLS", PWMValues_STAND[8][servo_index]));
+    analogWrite(FRE, translateBounds("FRE", PWMValues_STAND[3][servo_index]));
+    analogWrite(FLE, translateBounds("FLE", PWMValues_STAND[1][servo_index]));
+    analogWrite(BRE, translateBounds("BRE", PWMValues_STAND[7][servo_index]));
+    analogWrite(BLE, translateBounds("BLE", PWMValues_STAND[5][servo_index]));
+    analogWrite(MRE, translateBounds("MRE", PWMValues_STAND[11][servo_index]));
+    analogWrite(MLE, translateBounds("MLE",PWMValues_STAND[9][servo_index]));
     }
-    index++;
-    if(index == Stand_Arr_Size){
-      index = 0;
+    servo_index++;
+    if (servo_index == 1) {
+      servo_index = 0;
     }
 
   //Get the current actionID.
@@ -184,10 +184,11 @@ void loop() {
     //Get the numberOfPWMValues.
     //Assume that all of the arrays in PWMValues[actionID] are the same length,
     //so just get the length of the first array.
-    numberOfPWMValues = sizeof(PWMValues[actionID][0]) / sizeof(unsigned int);
+    //numberOfPWMValues = sizeof(PWMValues[actionID][0]) / sizeof(unsigned int);
   }
 
   //For every servo, actuate.
+  /*
   for (servoID = 0; servoID < 12; servoID++) {
     //Get the proportional (between 0 and 100) PWM value
     unsigned int proportionalPWMValue = PWMValues[actionID][servoID][PWMValuesIndex];
@@ -197,12 +198,12 @@ void loop() {
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
     analogWrite(servoPinNumber, PWMValue);
-  }
+  }*/
 
   //Increment PWMValuesIndex
-  PWMValuesIndex++;
+  //PWMValuesIndex++;
   //Make sure the PWMValuesIndex doesn't go past the end of the array of PWM values
-  PWMValuesIndex %= numberOfPWMValues;
+  //PWMValuesIndex %= numberOfPWMValues;
   
   //Have a small delay before the next call to loop()
   delay(2);
