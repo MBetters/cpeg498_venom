@@ -130,7 +130,7 @@ void loop() {
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
       actionID = 0;
-      PWMValues = &PWMValuesStand[0][0];
+      PWMValues = (unsigned int**) PWMValuesStand;
       numberOfPWMValues = 1;
     }
     else if (ch == 'w') {
@@ -164,31 +164,30 @@ void loop() {
     PWMValuesIndex = 0;
   }
 
-  //If the PWMValuesIndex reaches the end of the 2D action array,
-  //then do nothing, by returning out of the loop() function.
-  if (PWMValuesIndex == numberOfPWMValues) {
-    return;
-  }
-
-  //Actuate every servo
-  for (servoID = 0; servoID < 12; servoID++) {
-    //Get the proportional (between 0 and 1000) PWM value
-    unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
-    //Get the servo name
-    String servoName = servoNames[servoID];
-    //Get the actual PWM value
-    unsigned int PWMValue = translateBounds(servoID, proportionalPWMValue);
-    //Get the servo pin number
-    unsigned int servoPinNumber = servoPinNumbers[servoID];
-    //Actuate the servo with the PWM value
-    analogWrite(servoPinNumber, PWMValue);
-  }
-
-  //Increment PWMValuesIndex
-  PWMValuesIndex++;
+  //If the PWMValuesIndex hasn't reached the end of the 2D action array,
+  //then keep running the action.
+  if (PWMValuesIndex < numberOfPWMValues) {
+    //Actuate every servo
+    for (servoID = 0; servoID < 12; servoID++) {
+      //Get the proportional (between 0 and 1000) PWM value
+      unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
+      //Get the servo name
+      String servoName = servoNames[servoID];
+      //Get the actual PWM value
+      unsigned int PWMValue = translateBounds(servoID, proportionalPWMValue);
+      //Get the servo pin number
+      unsigned int servoPinNumber = servoPinNumbers[servoID];
+      //Actuate the servo with the PWM value
+      analogWrite(servoPinNumber, PWMValue);
+    }
   
-  //Have a small delay before the next call to loop()
-  delay(2);
+    //Increment PWMValuesIndex
+    PWMValuesIndex++;
+
+    //Have a small delay before the next call to loop()
+    delay(2);
+  }
+  
 }
 
 //////////////////////////////
