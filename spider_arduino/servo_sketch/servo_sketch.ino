@@ -177,7 +177,7 @@ void loop() {
     //Get the servo name
     String servoName = servoNames[servoID];
     //Get the actual PWM value
-    unsigned int PWMValue = translateBounds(servoName, proportionalPWMValue);
+    unsigned int PWMValue = translateBounds(servoID, proportionalPWMValue);
     //Get the servo pin number
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
@@ -198,44 +198,43 @@ void turnOn() {
   // Assumes a folded position of elbows at 700, shoulders at 0.
   for (int i=0; i < 100; i++) {
     delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
-    analogWrite(FRS, translateBounds("FRS", i * 8));
-    analogWrite(FLS, translateBounds("FLS", i * 8));
-    analogWrite(BRS, translateBounds("BRS", i * 3));
-    analogWrite(BLS, translateBounds("BLS", i * 3));
-    analogWrite(MRS, translateBounds("MRS", i * 6));
-    analogWrite(MLS, translateBounds("MLS", i * 6));
+    analogWrite(FRS, translateBounds(2, i * 8));
+    analogWrite(FLS, translateBounds(0, i * 8));
+    analogWrite(BRS, translateBounds(6, i * 3));
+    analogWrite(BLS, translateBounds(4, i * 3));
+    analogWrite(MRS, translateBounds(10, i * 6));
+    analogWrite(MLS, translateBounds(8, i * 6));
   }
   for (int i=700; i > 200; i--) {
     delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
-    analogWrite(FRE, translateBounds("FRE", i));
-    analogWrite(FLE, translateBounds("FLE", i));
-    analogWrite(BRE, translateBounds("BRE", i));
-    analogWrite(BLE, translateBounds("BLE", i));
-    analogWrite(MRE, translateBounds("MRE", i));
-    analogWrite(MLE, translateBounds("MLE", i));
+    analogWrite(FRE, translateBounds(3, i));
+    analogWrite(FLE, translateBounds(1, i));
+    analogWrite(BRE, translateBounds(7, i));
+    analogWrite(BLE, translateBounds(5, i));
+    analogWrite(MRE, translateBounds(11, i));
+    analogWrite(MLE, translateBounds(9, i));
   }
 }
 
 void turnOff() {
   // Assumes a standing position of elbows at 200.
-
   for (int i=200; i < 700; i++) {
     delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
-    analogWrite(FRE, translateBounds("FRE", i));
-    analogWrite(FLE, translateBounds("FLE", i));
-    analogWrite(BRE, translateBounds("BRE", i));
-    analogWrite(BLE, translateBounds("BLE", i));
-    analogWrite(MRE, translateBounds("MRE", i));
-    analogWrite(MLE, translateBounds("MLE", i));
+    analogWrite(FRE, translateBounds(3, i));
+    analogWrite(FLE, translateBounds(1, i));
+    analogWrite(BRE, translateBounds(7, i));
+    analogWrite(BLE, translateBounds(5, i));
+    analogWrite(MRE, translateBounds(11, i));
+    analogWrite(MLE, translateBounds(9, i));
   }
   for (int i=100; i > 0; i--) {
     delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
-    analogWrite(FRS, translateBounds("FRS", i * 8));
-    analogWrite(FLS, translateBounds("FLS", i * 8));
-    analogWrite(BRS, translateBounds("BRS", i * 3));
-    analogWrite(BLS, translateBounds("BLS", i * 3));
-    analogWrite(MRS, translateBounds("MRS", i * 6));
-    analogWrite(MLS, translateBounds("MLS", i * 6));
+    analogWrite(FRS, translateBounds(2, i * 8));
+    analogWrite(FLS, translateBounds(0, i * 8));
+    analogWrite(BRS, translateBounds(6, i * 3));
+    analogWrite(BLS, translateBounds(4, i * 3));
+    analogWrite(MRS, translateBounds(10, i * 6));
+    analogWrite(MLS, translateBounds(8, i * 6));
   }
   //resetFunc(); //call reset 
 }
