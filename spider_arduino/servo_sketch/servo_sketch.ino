@@ -1,4 +1,6 @@
-//These are the pin numbers of the different servos.
+///////////////////////////////////////
+//SECTION: Global Variable Definitions
+///////////////////////////////////////
 unsigned int FLS = 32; //front-left shoulder pin number
 unsigned int FLE = 21; //front-left elbow pin number
 unsigned int FRS = 10; //front-right shoulder pin number
@@ -19,12 +21,38 @@ unsigned int servoPinNumbers[] = {FLS, FLE,
                                   MLS, MLE,
                                   MRS, MRE};
 
+String servoNames[] = {"FLS", "FLE", 
+                       "FRS", "FRE",
+                       "BLS", "BLE",
+                       "BRS", "BRE",
+                       "MLS", "MLE",
+                       "MRS", "MRE"};
+
+unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
+                                           {1800, 5500},
+                                           {1790, 7700},
+                                           {7750, 2750},
+                                           {8650, 3800},
+                                           {1950, 6100},
+                                           {2000, 6500},
+                                           {8200, 3700},
+                                           {8200, 3800},
+                                           {1750, 5600},
+                                           {1450, 4500},
+                                           {8500, 3200}};
+  
+
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
-unsigned int Stand_Arr_Size = 1;
-// 7 Arrays that are 12x3
- //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
-unsigned int PWMValues_STAND[12][1] = {
+
+unsigned int actionID = 0;
+unsigned int servoID = 0;
+
+unsigned int** PWMValues;
+unsigned int PWMValuesIndex = 0;
+unsigned int numberOfPWMValues = 0;
+
+unsigned int PWMValuesStand[12][1] = {
   {800},
   {200},
   {800},
@@ -38,39 +66,10 @@ unsigned int PWMValues_STAND[12][1] = {
   {600},
   {200}
 };
-//unsigned int PWMValues_SIT[12][3];
-//unsigned int PWMValues_FORWARD[12][3];
-//unsigned int PWMValues_BACKWARD[12][3];
-unsigned int servo_index = 0;
 
-unsigned int actionID = 0;
-unsigned int servoID = 0;
-unsigned int PWMValuesIndex = 0;
-//unsigned int numberOfPWMValues = sizeof(PWMValues[actionID][servoID]) / sizeof(unsigned int);
-/*
-void testPWMPin(unsigned int PWMPinNumber) {
-  unsigned int i = PWMMin;
-  while (i < PWMMax) {
-    analogWrite(PWMPinNumber, i);
-    i = i + 1;
-    delay(1);
-  }
-}
-
-void runTests() {
-  //This function runs one or more tests.
-  testPWMPin(10);
-}*/
-/*
-unsigned int getActualPWMValue(unsigned int proportionalPWMValue) {
-   //proportionalPWMValue- number from 0 to 100 (silently maxed out at 100)
-   if (proportionalPWMValue > 100) {
-    proportionalPWMValue = 100;
-   }
-   //output- PWM value between PWMMin and PWMMax depending on proportionalPWMValue
-   return PWMMin + (PWMMax - PWMMin) * (proportionalPWMValue / 100);
-}
-*/
+////////////////////////////////////////
+//SECTION: setup() and loop() Functions
+////////////////////////////////////////
 void setup() {
 
   //Good resource on Teensy PWM capabilities: https://www.pjrc.com/teensy/td_pulse.html
@@ -113,34 +112,14 @@ void setup() {
   Serial.begin(9600);
 
   //Run all the tests.
-  //Comment this out in production.
-  //runTests();
+  //runTests(); //Comment this out in production, so that it doesn't run.
+  
   turnOn();
   
   Serial.println("setup done");
 }
 
 void loop() {
-  
-  if (actionID == 1) {
-    //{"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
-    analogWrite(FLS, translateBounds("FLS", PWMValues_STAND[0][servo_index]));
-    analogWrite(FRS, translateBounds("FRS", PWMValues_STAND[2][servo_index]));
-    analogWrite(BRS, translateBounds("BRS", PWMValues_STAND[6][servo_index]));
-    analogWrite(BLS, translateBounds("BLS", PWMValues_STAND[4][servo_index]));
-    analogWrite(MRS, translateBounds("MRS", PWMValues_STAND[10][servo_index]));
-    analogWrite(MLS, translateBounds("MLS", PWMValues_STAND[8][servo_index]));
-    analogWrite(FRE, translateBounds("FRE", PWMValues_STAND[3][servo_index]));
-    analogWrite(FLE, translateBounds("FLE", PWMValues_STAND[1][servo_index]));
-    analogWrite(BRE, translateBounds("BRE", PWMValues_STAND[7][servo_index]));
-    analogWrite(BLE, translateBounds("BLE", PWMValues_STAND[5][servo_index]));
-    analogWrite(MRE, translateBounds("MRE", PWMValues_STAND[11][servo_index]));
-    analogWrite(MLE, translateBounds("MLE",PWMValues_STAND[9][servo_index]));
-    }
-    servo_index++;
-    if (servo_index == 1) {
-      servo_index = 0;
-    }
 
   //Get the current actionID.
   if (Serial.available()) {
@@ -151,6 +130,8 @@ void loop() {
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
       actionID = 0;
+      PWMValues = &PWMValuesStand[0][0];
+      numberOfPWMValues = 1;
     }
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
@@ -176,39 +157,43 @@ void loop() {
       Serial.println("Received 'turn CCW' command");
       actionID = 6;
     }
-    else if(ch == 'x'){
+    else if (ch == 'x') {
       turnOff();
     }
     //Reset the PWMValuesIndex to zero.
     PWMValuesIndex = 0;
-    //Get the numberOfPWMValues.
-    //Assume that all of the arrays in PWMValues[actionID] are the same length,
-    //so just get the length of the first array.
-    //numberOfPWMValues = sizeof(PWMValues[actionID][0]) / sizeof(unsigned int);
   }
 
-  //For every servo, actuate.
-  /*
+  //If the PWMValuesIndex reaches the end of the 2D action array,
+  //then do nothing, by returning out of the loop() function.
+  if (PWMValuesIndex == numberOfPWMValues) {
+    return;
+  }
+
+  //Actuate every servo
   for (servoID = 0; servoID < 12; servoID++) {
-    //Get the proportional (between 0 and 100) PWM value
-    unsigned int proportionalPWMValue = PWMValues[actionID][servoID][PWMValuesIndex];
+    //Get the proportional (between 0 and 1000) PWM value
+    unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
+    //Get the servo name
+    String servoName = servoNames[servoID];
     //Get the actual PWM value
-    unsigned int PWMValue = getActualPWMValue(proportionalPWMValue);
+    unsigned int PWMValue = translateBounds(servoName, proportionalPWMValue);
     //Get the servo pin number
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
     analogWrite(servoPinNumber, PWMValue);
-  }*/
+  }
 
   //Increment PWMValuesIndex
-  //PWMValuesIndex++;
-  //Make sure the PWMValuesIndex doesn't go past the end of the array of PWM values
-  //PWMValuesIndex %= numberOfPWMValues;
+  PWMValuesIndex++;
   
   //Have a small delay before the next call to loop()
   delay(2);
 }
 
+//////////////////////////////
+//SECTION: Movement Functions
+//////////////////////////////
 void turnOn() {
   // Assumes a folded position of elbows at 700, shoulders at 0.
   for (int i=0; i < 100; i++) {
@@ -255,8 +240,10 @@ void turnOff() {
   //resetFunc(); //call reset 
 }
 
-
-unsigned int translateBounds(String servo, unsigned int value) {
+////////////////////////////
+//SECTION: Helper Functions
+////////////////////////////
+unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
   // This function maps input values from 0-1000 to the corresponding ranges for each servo, so they are 
   // calibrated to each other and none of them goes out of range and damages the robot. 
   // 0 for elbows means pushed all the way down, and 0 for shoulders means pushed all the way back.
@@ -264,29 +251,39 @@ unsigned int translateBounds(String servo, unsigned int value) {
   //
   // So, moving all elbows down together might look like this:
   //
-  // unsigned int allElbows = 100; 
+  // unsigned int allElbows = 100;
   //
-  // analogWrite(FRE, translateBounds("FRE", allElbows));
-  // analogWrite(FLE, translateBounds("FLE", allElbows));
-  // analogWrite(BRE, translateBounds("BRE", allElbows));
-  // analogWrite(BLE, translateBounds("BLE", allElbows));
-  // analogWrite(MRE, translateBounds("MRE", allElbows));
-  // analogWrite(MLE, translateBounds("MLE", allElbows));
-  int index = -1;
-  String servoNames[12] = {"FLS", "FLE", "FRS", "FRE", "BLS", "BLE", "BRS", "BRE", "MLS", "MLE", "MRS", "MRE"};
-  for (int i = 0; i < 12; i++) {
-    if (servo == servoNames[i]) {
-      index = i; 
-    }
-  }
-  if (index == -1) {
-    return 0;
-  }
-  unsigned int translationTable[12][2] = {{8600, 2200},{1800, 5500},{1790, 7700},{7750, 2750},{8650, 3800},{1950, 6100},{2000, 6500},{8200, 3700},{8200, 3800},{1750, 5600},{1450, 4500},{8500, 3200}};
+  // analogWrite(FRE, servoPWMValueBounds("FRE", allElbows));
+  // analogWrite(FLE, servoPWMValueBounds("FLE", allElbows));
+  // analogWrite(BRE, servoPWMValueBounds("BRE", allElbows));
+  // analogWrite(BLE, servoPWMValueBounds("BLE", allElbows));
+  // analogWrite(MRE, servoPWMValueBounds("MRE", allElbows));
+  // analogWrite(MLE, servoPWMValueBounds("MLE", allElbows));
   
-  if (translationTable[index][0] < translationTable[index][1]) {
-    return (unsigned int) ((translationTable[index][1] - translationTable[index][0]) * value / 1000) + translationTable[index][0];
+  if (servoPWMValueBounds[servoIndex][0] < servoPWMValueBounds[servoIndex][1]) {
+    return (unsigned int) ((servoPWMValueBounds[servoIndex][1]
+                          - servoPWMValueBounds[servoIndex][0]) * value / 1000)
+                          + servoPWMValueBounds[servoIndex][0];
   } else {
-    return (unsigned int) translationTable[index][0] - ((translationTable[index][0] - translationTable[index][1]) * value / 1000);
+    return (unsigned int) servoPWMValueBounds[servoIndex][0] 
+                          - ((servoPWMValueBounds[servoIndex][0]
+                            - servoPWMValueBounds[servoIndex][1]) * value / 1000);
+  }
+}
+
+/////////////////
+//SECTION: Tests
+/////////////////
+void runTests() {
+  //This function runs one or more tests.
+  testPWMPin(10);
+}
+
+void testPWMPin(unsigned int PWMPinNumber) {
+  unsigned int i = PWMMin;
+  while (i < PWMMax) {
+    analogWrite(PWMPinNumber, i);
+    i = i + 1;
+    delay(1);
   }
 }
