@@ -177,8 +177,10 @@ void loop() {
 
     //Have a small delay before the next call to loop()
     delay(2);
+  } else {
+    //If the end of the action sequence has been reached, start over and repeat until actionID is changed.
+    PWMValuesIndex = 0;
   }
-  
 }
 
 //////////////////////////////
@@ -242,12 +244,12 @@ unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
   //
   // unsigned int allElbows = 100;
   //
-  // analogWrite(FRE, servoPWMValueBounds("FRE", allElbows));
-  // analogWrite(FLE, servoPWMValueBounds("FLE", allElbows));
-  // analogWrite(BRE, servoPWMValueBounds("BRE", allElbows));
-  // analogWrite(BLE, servoPWMValueBounds("BLE", allElbows));
-  // analogWrite(MRE, servoPWMValueBounds("MRE", allElbows));
-  // analogWrite(MLE, servoPWMValueBounds("MLE", allElbows));
+  // analogWrite(FRE, translateBounds("FRE", allElbows));
+  // analogWrite(FLE, translateBounds("FLE", allElbows));
+  // analogWrite(BRE, translateBounds("BRE", allElbows));
+  // analogWrite(BLE, translateBounds("BLE", allElbows));
+  // analogWrite(MRE, translateBounds("MRE", allElbows));
+  // analogWrite(MLE, translateBounds("MLE", allElbows));
   
   if (servoPWMValueBounds[servoIndex][0] < servoPWMValueBounds[servoIndex][1]) {
     return (unsigned int) ((servoPWMValueBounds[servoIndex][1]
