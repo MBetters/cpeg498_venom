@@ -40,12 +40,10 @@ unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {1750, 5600},
                                            {1450, 4500},
                                            {8500, 3200}};
-  
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
 
-unsigned int actionID = 0;
 unsigned int servoID = 0;
 
 unsigned int** PWMValues;
@@ -121,7 +119,7 @@ void setup() {
 
 void loop() {
 
-  //Get the current actionID.
+  //Get the current action.
   if (Serial.available()) {
     char ch = Serial.read();
     //Here, the Arduino reads serial USB input, 
@@ -129,33 +127,26 @@ void loop() {
     //To test these serial inputs out on a computer, use Tools->Serial Monitor.
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
-      actionID = 0;
       PWMValues = (unsigned int**) PWMValuesStand;
       numberOfPWMValues = 1;
     }
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
-      actionID = 1;
     }
     else if (ch == 's') {
       Serial.println("Received 'move backward' command");
-      actionID = 2;
     }
     else if (ch == 'a') {
       Serial.println("Received 'sidestep left' command");
-      actionID = 3;
     }
     else if (ch == 'd') {
       Serial.println("Received 'sidestep right' command");
-      actionID = 4;
     }
     else if (ch == 'c') {
       Serial.println("Received 'turn CW' command");
-      actionID = 5;
     }
     else if (ch == 'v') {
       Serial.println("Received 'turn CCW' command");
-      actionID = 6;
     }
     else if (ch == 'x') {
       turnOff();
@@ -197,21 +188,21 @@ void turnOn() {
   // Assumes a folded position of elbows at 700, shoulders at 0.
   for (int i=0; i < 100; i++) {
     delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
-    analogWrite(FRS, translateBounds(2, i * 8));
     analogWrite(FLS, translateBounds(0, i * 8));
-    analogWrite(BRS, translateBounds(6, i * 3));
+    analogWrite(FRS, translateBounds(2, i * 8));
     analogWrite(BLS, translateBounds(4, i * 3));
-    analogWrite(MRS, translateBounds(10, i * 6));
+    analogWrite(BRS, translateBounds(6, i * 3));
     analogWrite(MLS, translateBounds(8, i * 6));
+    analogWrite(MRS, translateBounds(10, i * 6));
   }
   for (int i=700; i > 200; i--) {
     delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
-    analogWrite(FRE, translateBounds(3, i));
     analogWrite(FLE, translateBounds(1, i));
-    analogWrite(BRE, translateBounds(7, i));
+    analogWrite(FRE, translateBounds(3, i));
     analogWrite(BLE, translateBounds(5, i));
-    analogWrite(MRE, translateBounds(11, i));
+    analogWrite(BRE, translateBounds(7, i));
     analogWrite(MLE, translateBounds(9, i));
+    analogWrite(MRE, translateBounds(11, i));
   }
 }
 
@@ -219,21 +210,21 @@ void turnOff() {
   // Assumes a standing position of elbows at 200.
   for (int i=200; i < 700; i++) {
     delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
-    analogWrite(FRE, translateBounds(3, i));
     analogWrite(FLE, translateBounds(1, i));
-    analogWrite(BRE, translateBounds(7, i));
+    analogWrite(FRE, translateBounds(3, i));
     analogWrite(BLE, translateBounds(5, i));
-    analogWrite(MRE, translateBounds(11, i));
+    analogWrite(BRE, translateBounds(7, i));
     analogWrite(MLE, translateBounds(9, i));
+    analogWrite(MRE, translateBounds(11, i));
   }
   for (int i=100; i > 0; i--) {
     delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
-    analogWrite(FRS, translateBounds(2, i * 8));
     analogWrite(FLS, translateBounds(0, i * 8));
-    analogWrite(BRS, translateBounds(6, i * 3));
+    analogWrite(FRS, translateBounds(2, i * 8));
     analogWrite(BLS, translateBounds(4, i * 3));
-    analogWrite(MRS, translateBounds(10, i * 6));
+    analogWrite(BRS, translateBounds(6, i * 3));
     analogWrite(MLS, translateBounds(8, i * 6));
+    analogWrite(MRS, translateBounds(10, i * 6));
   }
   //resetFunc(); //call reset 
 }
