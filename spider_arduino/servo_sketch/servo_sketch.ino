@@ -71,10 +71,11 @@ unsigned int PWMMax = 6553;
 
 unsigned int servoID = 0;
 
-unsigned int** PWMValues;
+unsigned int* PWMValues;
 unsigned int PWMValuesIndex = 0;
 unsigned int numberOfPWMValues = 0;
 
+unsigned int STAND_ARRAY_LENGTH = 1;
 unsigned int PWMValuesStand[12][1] = {
   {800},
   {200},
@@ -88,6 +89,22 @@ unsigned int PWMValuesStand[12][1] = {
   {200},
   {600},
   {200}
+};
+
+unsigned int WALK_ARRAY_LENGTH = 2;
+unsigned int PWMValuesWalk[12][2] = {
+  {800, 800},
+  {200, 400},
+  {800, 800},
+  {200, 200},
+  {300, 300},
+  {200, 400},
+  {300, 300},
+  {200, 200},
+  {600, 600},
+  {200, 200},
+  {600, 600},
+  {200, 400}
 };
 
 ////////////////////////////////////////
@@ -153,10 +170,12 @@ void loop() {
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
       PWMValues = (unsigned int**) PWMValuesStand;
-      numberOfPWMValues = 1;
+      numberOfPWMValues = STAND_ARRAY_LENGTH;
     }
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
+      *PWMValues = (unsigned int**) PWMValuesWalk;
+      numberOfPWMValues = WALK_ARRAY_LENGTH;
     }
     else if (ch == 's') {
       Serial.println("Received 'move backward' command");
@@ -182,19 +201,27 @@ void loop() {
 
   //If the PWMValuesIndex hasn't reached the end of the 2D action array,
   //then keep running the action.
-  if (PWMValuesIndex < numberOfPWMValues && compareArray(currentPosition, desiredPosition)) {
+  if (PWMValuesIndex < numberOfPWMValues && compareArray(currentPos, desiredPos)) {
+    Serial.println("Next step in sequence.");
     //Update desiredPos for every servo
     for (servoID = 0; servoID < 12; servoID++) {
       //Get the proportional (between 0 and 1000) PWM value
       unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
+      Serial.print("proportionalPWMValue: ");
+      Serial.println(proportionalPWMValue);
       // Update with the start-to-finish distance for the servo.
-      totalDistance[servoID] = proportionalPWMValue - currentPos[servoID];
+      totalDistance[servoID] = (int) proportionalPWMValue - (int) currentPos[servoID];
       //Actuate the servo with the PWM value
-      desiredPosition[servoPinNumber] = proportionalPWMValue;
+      desiredPos[servoID] = proportionalPWMValue;
+      Serial.print("desiredPos[");
+      Serial.println(servoID);
+      Serial.print("]: ");
+      Serial.println(desiredPos[servoID]);
     }
     //Increment PWMValuesIndex
     PWMValuesIndex++;
-  } else if (!compareArray(currentPosition, desiredPosition) {
+  } else if (!compareArray(currentPos, desiredPos)) {
+    Serial.println("Increment PWMs.");
     PWMIncrement();
   } else {
     //If the end of the action sequence has been reached, start over and repeat until actionID is changed.
@@ -260,6 +287,8 @@ void PWMIncrement() {
   for (servoID = 0; servoID < 12; servoID++) {
     //Find the distance required for the servo to move 1/n of the way to the destination.
     int stepSize = totalDistance[servoID] / 10;
+    Serial.print("stepSize: ");
+    Serial.println(stepSize);
     //Add (or implicitly subtract) the step size from the current servo position
     unsigned int nextProportionalPWMValue = currentPos[servoID] + stepSize;
     // Near the end, numbers may need to be rounded so they perfectly end up where they should
@@ -271,12 +300,17 @@ void PWMIncrement() {
     //Get the servo pin number
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
+    Serial.print("analogWrite(");
+    Serial.print(servoNames[servoID]);
+    Serial.print(", ");
+    Serial.print(nextProportionalPWMValue);
+    Serial.println(")");
     analogWrite(servoPinNumber, PWMValue);
   }
 }
 
 
-boolean compareArray(int *a, int *b){
+boolean compareArray(unsigned int *a, unsigned int *b){
   int n;
   
   // test each element to be the same. if not, return false
