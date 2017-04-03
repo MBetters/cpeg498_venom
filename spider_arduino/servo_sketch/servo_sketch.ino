@@ -162,8 +162,6 @@ void loop() {
     for (servoID = 0; servoID < 12; servoID++) {
       //Get the proportional (between 0 and 1000) PWM value
       unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
-      //Get the servo name
-      String servoName = servoNames[servoID];
       //Get the actual PWM value
       unsigned int PWMValue = translateBounds(servoID, proportionalPWMValue);
       //Get the servo pin number
