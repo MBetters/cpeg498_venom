@@ -28,6 +28,22 @@ String servoNames[] = {"FLS", "FLE",
                        "MLS", "MLE",
                        "MRS", "MRE"};
 
+// Denotes current, actual PWM output, NOT the desired postion it's moving toward. Begins at standing position.
+unsigned int currentPosition[12] = {800, 200, 
+                                    800, 200, 
+                                    300, 200, 
+                                    300, 200,
+                                    600, 200,
+                                    600, 200};
+
+// Desired PWM position, which currentPosition slowly moves towards over a few loop() cycles.
+unsigned int desiredPosition[12] = {800, 200, 
+                                    800, 200, 
+                                    300, 200, 
+                                    300, 200,
+                                    600, 200,
+                                    600, 200};
+
 unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {1800, 5500},
                                            {1790, 7700},
@@ -157,7 +173,7 @@ void loop() {
 
   //If the PWMValuesIndex hasn't reached the end of the 2D action array,
   //then keep running the action.
-  if (PWMValuesIndex < numberOfPWMValues) {
+  if (PWMValuesIndex < numberOfPWMValues && compareArray(currentPosition, desiredPosition)) {
     //Actuate every servo
     for (servoID = 0; servoID < 12; servoID++) {
       //Get the proportional (between 0 and 1000) PWM value
@@ -175,9 +191,11 @@ void loop() {
 
     //Have a small delay before the next call to loop()
     delay(2);
+  } else if {
+    PWMIncrement();
   } else {
     //If the end of the action sequence has been reached, start over and repeat until actionID is changed.
-    PWMValuesIndex = 0;
+    //PWMValuesIndex = 0;
   }
 }
 
@@ -210,21 +228,21 @@ void turnOff() {
   // Assumes a standing position of elbows at 200.
   for (int i=200; i < 700; i++) {
     delay(4); // Whole process takes 2 seconds: 500 * 4ms = 2000ms
-    analogWrite(FLE, translateBounds(1, i));
     analogWrite(FRE, translateBounds(3, i));
-    analogWrite(BLE, translateBounds(5, i));
+    analogWrite(FLE, translateBounds(1, i));
     analogWrite(BRE, translateBounds(7, i));
-    analogWrite(MLE, translateBounds(9, i));
+    analogWrite(BLE, translateBounds(5, i));
     analogWrite(MRE, translateBounds(11, i));
+    analogWrite(MLE, translateBounds(9, i));
   }
   for (int i=100; i > 0; i--) {
     delay(20); // Whole process takes 2 seconds: 100 * 20ms = 2000ms
-    analogWrite(FLS, translateBounds(0, i * 8));
     analogWrite(FRS, translateBounds(2, i * 8));
-    analogWrite(BLS, translateBounds(4, i * 3));
+    analogWrite(FLS, translateBounds(0, i * 8));
     analogWrite(BRS, translateBounds(6, i * 3));
-    analogWrite(MLS, translateBounds(8, i * 6));
+    analogWrite(BLS, translateBounds(4, i * 3));
     analogWrite(MRS, translateBounds(10, i * 6));
+    analogWrite(MLS, translateBounds(8, i * 6));
   }
   //resetFunc(); //call reset 
 }
@@ -232,6 +250,25 @@ void turnOff() {
 ////////////////////////////
 //SECTION: Helper Functions
 ////////////////////////////
+
+void PWMIncrement() {
+  desiredPosition[pin] = PWMValue;
+}
+
+
+boolean compareArray(int *a, int *b, int len_a, int len_b){
+     int n;
+
+     // if their lengths are different, return false
+     if (len_a != len_b) return false;
+
+     // test each element to be the same. if not, return false
+     for (n=0;n<len_a;n++) if (a[n]!=b[n]) return false;
+
+     //ok, if we have not returned yet, they are equal :)
+     return true;
+}
+
 unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
   // This function maps input values from 0-1000 to the corresponding ranges for each servo, so they are 
   // calibrated to each other and none of them goes out of range and damages the robot. 
