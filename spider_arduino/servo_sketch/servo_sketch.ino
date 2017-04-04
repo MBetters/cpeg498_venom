@@ -46,12 +46,7 @@ unsigned int desiredPos[12] = {800, 200,
 
 // Updated every new step in a sequence- array is used to know total distance from start to finish for each servo,
 // so that they can run at the speed required for them to all finish at the same time.
-int totalDistance[12] = {0, 0, 
-                         0, 0, 
-                         0, 0, 
-                         0, 0,
-                         0, 0,
-                         0, 0};
+int totalDistance[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {1800, 5500},
@@ -224,11 +219,11 @@ void loop() {
     Serial.println("Increment PWMs.");
     PWMIncrement();
   } else {
-    //If the end of the action sequence has been reached, start over and repeat until actionID is changed.
+    //If the end of the action sequence has been reached, start over and repeat until new command is received.
     PWMValuesIndex = 0;
   }
   //Have a small delay before the next call to loop()
-  delay(100);
+  delay(200);
 }
 
 //////////////////////////////
@@ -309,10 +304,8 @@ void PWMIncrement() {
   }
 }
 
-
 boolean compareArray(unsigned int *a, unsigned int *b){
   int n;
-  
   // test each element to be the same. if not, return false
   for (n=0; n < 12; n++) {
     if (a[n] != b[n]) return false;
