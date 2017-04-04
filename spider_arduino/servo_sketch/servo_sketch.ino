@@ -71,7 +71,7 @@ unsigned int PWMMax = 6553;
 
 unsigned int servoID = 0;
 
-unsigned int* PWMValues;
+unsigned int* PWMValues[12];
 unsigned int PWMValuesIndex = 0;
 unsigned int numberOfPWMValues = 0;
 
@@ -169,12 +169,12 @@ void loop() {
     //To test these serial inputs out on a computer, use Tools->Serial Monitor.
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
-      PWMValues = (unsigned int**) PWMValuesStand;
+      for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesStand[i];
       numberOfPWMValues = STAND_ARRAY_LENGTH;
     }
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
-      *PWMValues = (unsigned int**) PWMValuesWalk;
+      for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesWalk[i];
       numberOfPWMValues = WALK_ARRAY_LENGTH;
     }
     else if (ch == 's') {
