@@ -51,6 +51,9 @@ int totalDistance[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 // Needed to compensate for loss of precision throughout movement increments.
 float remainders[12] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
+// Variable that keeps track of what the 'lowest' point is for the spider, to know that if a knee is low enough it 'should' be touching the ground.
+unsigned int lowPoint = 0;
+
 unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {1660, 5500},
                                            {1790, 7700},
@@ -200,6 +203,8 @@ void loop() {
   //If the PWMValuesIndex hasn't reached the end of the 2D action array,
   //then keep running the action.
   if (PWMValuesIndex < numberOfPWMValues && compareArray(currentPos, desiredPos)) {
+    // Reset lowPoint
+    lowPoint = 1000;
     Serial.print("Next step: ");
     Serial.println(PWMValuesIndex);
     //Update desiredPos for every servo
@@ -210,6 +215,8 @@ void loop() {
       totalDistance[servoID] = proportionalPWMValue - currentPos[servoID];
       //Actuate the servo with the PWM value
       desiredPos[servoID] = proportionalPWMValue;
+      //Update lowPoint variable to reevaluate the lowest elbow value for the next step
+      if (servoID % 2 == 1 && lowPoint > proportionalPWMValue) lowPoint = proportionalPWMValue;
     }
     //Increment PWMValuesIndex
     PWMValuesIndex++;
