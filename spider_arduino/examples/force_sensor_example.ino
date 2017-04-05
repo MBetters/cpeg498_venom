@@ -1,12 +1,12 @@
 
- // Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
- // Possible pins for each force sensor: 14, 15, 16, 17, 18, 19
-int fsrFLL = 14; // FSR for Front Left Leg
-int fsrMLL = 15; // Middle Left Leg
-int fsrBLL = 16; // Back Left Leg
-int fsrFRL = 17; // Front Right Leg
-int fsrMRL = 18; // Middle Right Leg
-int fsrBRL = 19; // Back Right Leg
+// Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
+// Possible pins for each force sensor: 14, 15, 16, 17, 18, 19
+unsigned int fsrFLL = 14; // FSR for Front Left Leg
+unsigned int fsrMLL = 15; // Middle Left Leg
+unsigned int fsrBLL = 16; // Back Left Leg
+unsigned int fsrFRL = 17; // Front Right Leg
+unsigned int fsrMRL = 18; // Middle Right Leg
+unsigned int fsrBRL = 19; // Back Right Leg
  
 void setup() {
   Serial.begin(9600);   // Send debugging information via the Serial monitor
@@ -22,7 +22,7 @@ void loop() {
   delay(100);
 }
 
-unsigned int getSensorRead(unsigned int SensorPinNumber)
+void int getSensorRead(unsigned int SensorPinNumber)
 {
   if (SensorPinNumber == 14)
   {
