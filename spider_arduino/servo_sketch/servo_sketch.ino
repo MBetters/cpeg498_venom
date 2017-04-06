@@ -1,6 +1,7 @@
-///////////////////////////////////////
-//SECTION: Global Variable Definitions
-///////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//SECTION: Pin-Number-Related and Name-Related Global Variables
+////////////////////////////////////////////////////////////////
+
 unsigned int FLS = 32; //front-left shoulder pin number
 unsigned int FLE = 21; //front-left elbow pin number
 unsigned int FRS = 10; //front-right shoulder pin number
@@ -28,58 +29,88 @@ String servoNames[] = {"FLS", "FLE",
                        "MLS", "MLE",
                        "MRS", "MRE"};
 
-// Denotes current, actual PWM output, NOT the desired postion it's moving toward. Begins at standing position.
-unsigned int currentPosition[12] = {800, 200, 
-                                    800, 200, 
-                                    300, 200, 
-                                    300, 200,
-                                    600, 200,
-                                    600, 200};
+String legNames = {"FL", "FR",
+                   "ML", "MR",
+                   "BL", "BR"}
 
-// Desired PWM position, which currentPosition slowly moves towards over a few loop() cycles.
-unsigned int desiredPosition[12] = {800, 200, 
-                                    800, 200, 
-                                    300, 200, 
-                                    300, 200,
-                                    600, 200,
-                                    600, 200};
+//////////////////////////////////////////
+//SECTION: State-Related Global Variables
+//////////////////////////////////////////
 
-unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
-                                           {1800, 5500},
-                                           {1790, 7700},
-                                           {7750, 2750},
-                                           {8650, 3800},
-                                           {1950, 6100},
-                                           {2000, 6500},
-                                           {8200, 3700},
-                                           {8200, 3800},
-                                           {1750, 5600},
-                                           {1450, 4500},
-                                           {8500, 3200}};
+enum LEG_STATE {
+  UP_FORWARD,
+  UP_BACKWARD,
+  DOWN_FORWARD,
+  DOWN_BACKWARD
+};
+
+LEG_STATE** spiderStates;
+unsigned int spiderStatesIndex = 0;
+unsigned int numberOfSpiderStates = 0;
+
+LEG_STATE* currentSpiderState;
+LEG_STATE* nextSpiderState;
+
+LEG_STATE spiderStates_STAND[1][6] = {{DOWN_FORWARD, DOWN_FORWARD, 
+                                       DOWN_FORWARD, DOWN_FORWARD, 
+                                       DOWN_BACKWARD, DOWN_BACKWARD}};
+
+LEG_STATE spiderStates_WALK_FORWARD[6][6] = {{DOWN_FORWARD, DOWN_BACKWARD, //stand (all legs are down) (also acts as lowering the second leg-triangle when "wrapping around" this array)
+                                              DOWN_BACKWARD, DOWN_FORWARD, 
+                                              DOWN_FORWARD, DOWN_BACKWARD},
+                                             {DOWN_FORWARD, UP_BACKWARD, //lift first leg-triangle (FR, ML, BR)
+                                              UP_BACKWARD, DOWN_FORWARD, 
+                                              DOWN_FORWARD, UP_BACKWARD},
+                                             {DOWN_BACKWARD, UP_FORWARD, //rotate leg-triangles (moves the spider forward)
+                                              UP_FORWARD, DOWN_BACKWARD, 
+                                              DOWN_BACKWARD, UP_FORWARD},
+                                             {DOWN_BACKWARD, DOWN_FORWARD, //lower first leg-triangle (FR, ML, BR), going to standing position
+                                              DOWN_FORWARD, DOWN_BACKWARD, 
+                                              DOWN_BACKWARD, DOWN_FORWARD},
+                                           //Mirror states below...
+                                             {UP_BACKWARD, DOWN_FORWARD, //lift second leg-triangle (FL, MR, BL)
+                                              DOWN_FORWARD, UP_BACKWARD, 
+                                              UP_BACKWARD, DOWN_FORWARD},
+                                             {UP_FORWARD, DOWN_BACKWARD, //rotate leg-triangles (moves the spider forward)
+                                              DOWN_BACKWARD, UP_FORWARD,
+                                              UP_FORWARD, DOWN_BACKWARD}};
+
+////////////////////////////////////////
+//SECTION: PWM-Related Global Variables
+////////////////////////////////////////
+
+unsigned int servoPWMValueBounds[12][2] = {{8600, 2200}, {1800, 5500},
+                                           {1790, 7700}, {7750, 2750},
+                                           {8650, 3800}, {1950, 6100},
+                                           {2000, 6500}, {8200, 3700},
+                                           {8200, 3800}, {1750, 5600},
+                                           {1450, 4500}, {8500, 3200}};
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
 
-unsigned int servoID = 0;
+//Denotes current, actual PWM output, NOT the desired postion it's moving toward. Begins at standing position.
+float currentPos[12] = {800, 200, 
+                        800, 200, 
+                        300, 200, 
+                        300, 200,
+                        600, 200,
+                        600, 200};
 
-unsigned int** PWMValues;
-unsigned int PWMValuesIndex = 0;
-unsigned int numberOfPWMValues = 0;
+// Desired PWM position, which currentPosition slowly moves towards over a few loop() cycles.
+unsigned int desiredPos[12] = {800, 200, 
+                               800, 200, 
+                               300, 200, 
+                               300, 200,
+                               600, 200,
+                               600, 200};
 
-unsigned int PWMValuesStand[12][1] = {
-  {800},
-  {200},
-  {800},
-  {200},
-  {300},
-  {200},
-  {300},
-  {200},
-  {600},
-  {200},
-  {600},
-  {200}
-};
+// Updated every new step in a sequence- array is used to know total distance from start to finish for each servo,
+// so that they can run at the speed required for them to all finish at the same time.
+unsigned int totalDistance[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+// Needed to compensate for loss of precision throughout movement increments.
+float remainders[12] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 ////////////////////////////////////////
 //SECTION: setup() and loop() Functions
@@ -127,7 +158,7 @@ void setup() {
 
   //Run all the tests.
   //runTests(); //Comment this out in production, so that it doesn't run.
-  
+
   turnOn();
   
   Serial.println("setup done");
@@ -143,11 +174,13 @@ void loop() {
     //To test these serial inputs out on a computer, use Tools->Serial Monitor.
     if (ch == 'q') {
       Serial.println("Received 'stand up' command");
-      PWMValues = (unsigned int**) PWMValuesStand;
-      numberOfPWMValues = 1;
+      spiderStates = (LEG_STATE**) spiderStates_STAND;
+      numberOfSpiderStates = 1;
     }
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
+      spiderStates = (LEG_STATE**) spiderStates_WALK_FORWARD;
+      numberOfSpiderStates = 6;
     }
     else if (ch == 's') {
       Serial.println("Received 'move backward' command");
@@ -168,40 +201,48 @@ void loop() {
       turnOff();
     }
     //Reset the PWMValuesIndex to zero.
-    PWMValuesIndex = 0;
+    spiderStatesIndex = 0;
   }
 
-  //If the PWMValuesIndex hasn't reached the end of the 2D action array,
-  //then keep running the action.
-  if (PWMValuesIndex < numberOfPWMValues && compareArray(currentPosition, desiredPosition)) {
-    //Actuate every servo
-    for (servoID = 0; servoID < 12; servoID++) {
-      //Get the proportional (between 0 and 1000) PWM value
-      unsigned int proportionalPWMValue = PWMValues[servoID][PWMValuesIndex];
-      //Get the actual PWM value
-      unsigned int PWMValue = translateBounds(servoID, proportionalPWMValue);
-      //Get the servo pin number
-      unsigned int servoPinNumber = servoPinNumbers[servoID];
-      //Actuate the servo with the PWM value
-      analogWrite(servoPinNumber, PWMValue);
+  //If the spiderStatesIndex hasn't reached the end of the 2D spiderStates array,
+  //then keep running the action described by spiderStates.
+  if (spiderStatesIndex < numberOfSpiderStates) {
+    //Move every leg
+    bool nextLegStatesHaveBeenReached[6] = {false, false, false, false, false, false};
+    unsigned int legIndex = 0;
+    for (legIndex = 0; legIndex < 6; legIndex++) {
+      LEG_STATE currentLegState = currentSpiderState[legIndex];
+      LEG_STATE nextLegState = nextSpiderState[legIndex];
+      bool nextLegStateHasBeenReached = moveLeg(legIndex, currentLegState, nextLegState);
+      nextLegStatesHaveBeenReached[legIndex] = nextLegStateHasBeenReached;
     }
-  
-    //Increment PWMValuesIndex
-    PWMValuesIndex++;
+
+    bool nextSpiderStateHasBeenReached = true;
+    for (legIndex = 0; legIndex < 6; legIndex++) {
+      if (nextLegStatesHaveBeenReached[legIndex] == false) {
+        nextSpiderStateHasBeenReached = false;
+        break;
+      }
+    }
+
+    if (nextSpiderStateHasBeenReached) {
+      //The currentSpiderState has successfully reached the nextSpiderState, 
+      //so assign the nextSpiderState to the currentSpiderState
+      currentSpiderState = nextSpiderState;
+      //Increment spiderStatesIndex (to point to the next spider state)
+      spiderStatesIndex++;
+      //Get the nextSpiderState
+      nextSpiderState = spiderStates[spiderStatesIndex];
+    }
 
     //Have a small delay before the next call to loop()
     delay(2);
-  } else if {
-    PWMIncrement();
-  } else {
-    //If the end of the action sequence has been reached, start over and repeat until actionID is changed.
-    //PWMValuesIndex = 0;
   }
 }
 
-//////////////////////////////
-//SECTION: Movement Functions
-//////////////////////////////
+///////////////////////////////////////////
+//SECTION: turnOn() and turnOff() Functions
+///////////////////////////////////////////
 void turnOn() {
   // Assumes a folded position of elbows at 700, shoulders at 0.
   for (int i=0; i < 100; i++) {
@@ -247,26 +288,88 @@ void turnOff() {
   //resetFunc(); //call reset 
 }
 
+/////////////////////////////
+//SECTION: moveLeg() Function
+/////////////////////////////
+bool moveLeg(unsigned int legIndex, LEG_STATE currentState, LEG_STATE nextState) {
+  bool nextLegStateHasBeenReached = false;
+  
+  String legName = legNames[legIndex];
+  String currentStateName = getStateName(currentState);
+  String nextStateName = getStateName(nextState);
+  Serial.println("Moving the " + legName + " leg from the " + currentStateName + " state to the " + nextStateName + " state.");
+
+  unsigned int shoulderServoPinNumber = getShoulderServoPinNumber(legName);
+  unsigned int elbowServoPinNumber = getElbowServoPinNumber(legName);
+
+  //TODO: Implement the bodies of these conditionals.
+  if (currentState == UP_FORWARD && nextState == UP_BACKWARD) {
+    //interpolate and move the leg accordingly
+  } else if (currentState == UP_FORWARD && nextState == DOWN_FORWARD) {
+    //check force sensor...
+    //then if force sensor is high, do nothing
+    //else, move the leg by a constant tiny bit
+  } else if (currentState == UP_FORWARD && nextState == DOWN_BACKWARD) {
+    
+  } else if (currentState == UP_BACKWARD && nextState == UP_FORWARD) {
+    
+  } else if (currentState == UP_BACKWARD && nextState == DOWN_FORWARD) {
+    
+  } else if (currentState == UP_BACKWARD && nextState == DOWN_BACKWARD) {
+    
+  } else if (currentState == DOWN_FORWARD && nextState == DOWN_BACKWARD) {
+    
+  } else if (currentState == DOWN_FORWARD && nextState == UP_FORWARD) {
+    
+  } else if (currentState == DOWN_FORWARD && nextState == UP_BACKWARD) {
+    
+  } else if (currentState == DOWN_BACKWARD && nextState == DOWN_FORWARD) {
+    
+  } else if (currentState == DOWN_BACKWARD && nextState == UP_FORWARD) {
+    
+  } else if (currentState == DOWN_BACKWARD && nextState == UP_BACKWARD) {
+    
+  }
+
+  return nextLegStateHasBeenReached;
+}
+
+//////////////////////////////
+//SECTION: Interpolation Code
+//////////////////////////////
+void PWMIncrement(servoID) {
+  // Takes an incremental step towards the 'desiredPos' array, updating the analog PWM output and the currentPos array to reflect that.
+  //Find the distance required for the servo to move 1/n of the way to the destination.
+  float stepSize = ((float) totalDistance[servoID]) / 100;
+  //Add (or implicitly subtract) the step size from the current servo position
+  float nextProportionalPWMValue = currentPos[servoID] + stepSize;
+  // Near the end, numbers may need to be rounded so they perfectly end up where they should
+  if (abs(nextProportionalPWMValue - desiredPos[servoID]) < abs(stepSize)) {
+    nextProportionalPWMValue = desiredPos[servoID];
+  }
+  //Get the actual PWM value
+  unsigned int PWMValue = translateBounds(servoID, (int) nextProportionalPWMValue);
+  //Update what our current PWM output is for this servo
+  currentPos[servoID] = nextProportionalPWMValue;
+  //Get the servo pin number
+  unsigned int servoPinNumber = servoPinNumbers[servoID];
+  //Actuate the servo with the PWM value
+  analogWrite(servoPinNumber, PWMValue);
+}
+
 ////////////////////////////
 //SECTION: Helper Functions
 ////////////////////////////
-
-void PWMIncrement() {
-  desiredPosition[pin] = PWMValue;
-}
-
-
-boolean compareArray(int *a, int *b, int len_a, int len_b){
-     int n;
-
-     // if their lengths are different, return false
-     if (len_a != len_b) return false;
-
-     // test each element to be the same. if not, return false
-     for (n=0;n<len_a;n++) if (a[n]!=b[n]) return false;
-
-     //ok, if we have not returned yet, they are equal :)
-     return true;
+String getStateName(LEG_STATE state) {
+  if (state == UP_FORWARD) {
+    return "UP_FORWARD";
+  } else if (state == "UP_BACKWARD") {
+    return "UP_FORWARD";
+  } else if (state == "DOWN_FORWARD") {
+    return "DOWN_FORWARD";
+  } else if (state == "DOWN_BACKWARD") {
+    return "DOWN_BACKWARD";
+  }
 }
 
 unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
@@ -297,12 +400,29 @@ unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
   }
 }
 
+bool nextSpiderStateHasBeenReached() {
+  unsigned int legIndex
+}
+
 /////////////////
 //SECTION: Tests
 /////////////////
 void runTests() {
   //This function runs one or more tests.
-  testPWMPin(10);
+
+  //Test the servos' operations
+  testPWMPin(FLS);
+  testPWMPin(FLE);
+  testPWMPin(FRS);
+  testPWMPin(FRE);
+  testPWMPin(BLS);
+  testPWMPin(BLE);
+  testPWMPin(BRS);
+  testPWMPin(BRE);
+  testPWMPin(MLS);
+  testPWMPin(MLE);
+  testPWMPin(MRS);
+  testPWMPin(MRE);
 }
 
 void testPWMPin(unsigned int PWMPinNumber) {
