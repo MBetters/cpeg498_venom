@@ -29,9 +29,9 @@ String servoNames[] = {"FLS", "FLE",
                        "MLS", "MLE",
                        "MRS", "MRE"};
 
-String legNames = {"FL", "FR",
-                   "ML", "MR",
-                   "BL", "BR"}
+String legNames[6] = {"FL", "FR",
+                      "ML", "MR",
+                      "BL", "BR"};
 
 //////////////////////////////////////////
 //SECTION: State-Related Global Variables
@@ -337,7 +337,7 @@ bool moveLeg(unsigned int legIndex, LEG_STATE currentState, LEG_STATE nextState)
 //////////////////////////////
 //SECTION: Interpolation Code
 //////////////////////////////
-void PWMIncrement(servoID) {
+void PWMIncrement(unsigned int servoID) {
   // Takes an incremental step towards the 'desiredPos' array, updating the analog PWM output and the currentPos array to reflect that.
   //Find the distance required for the servo to move 1/n of the way to the destination.
   float stepSize = ((float) totalDistance[servoID]) / 100;
@@ -363,13 +363,47 @@ void PWMIncrement(servoID) {
 String getStateName(LEG_STATE state) {
   if (state == UP_FORWARD) {
     return "UP_FORWARD";
-  } else if (state == "UP_BACKWARD") {
+  } else if (state == UP_BACKWARD) {
     return "UP_FORWARD";
-  } else if (state == "DOWN_FORWARD") {
+  } else if (state == DOWN_FORWARD) {
     return "DOWN_FORWARD";
-  } else if (state == "DOWN_BACKWARD") {
+  } else if (state == DOWN_BACKWARD) {
     return "DOWN_BACKWARD";
   }
+}
+
+unsigned int getShoulderServoPinNumber(String legName) {
+  if (legName == "FL") {
+    return FLS;
+  } else if (legName == "FR") {
+    return FRS;
+  } else if (legName == "BL") {
+    return BLS;
+  } else if (legName == "BR") {
+    return BRS;
+  } else if (legName == "ML") {
+    return MLS;
+  } else if (legName == "MR") {
+    return MRS;
+  }
+  return 0; //return zero by default
+}
+
+unsigned int getElbowServoPinNumber(String legName) {
+  if (legName == "FL") {
+    return FLE;
+  } else if (legName == "FR") {
+    return FRE;
+  } else if (legName == "BL") {
+    return BLE;
+  } else if (legName == "BR") {
+    return BRE;
+  } else if (legName == "ML") {
+    return MLE;
+  } else if (legName == "MR") {
+    return MRE;
+  }
+  return 0; //return zero by default
 }
 
 unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
@@ -398,10 +432,6 @@ unsigned int translateBounds(unsigned int servoIndex, unsigned int value) {
                           - ((servoPWMValueBounds[servoIndex][0]
                             - servoPWMValueBounds[servoIndex][1]) * value / 1000);
   }
-}
-
-bool nextSpiderStateHasBeenReached() {
-  unsigned int legIndex
 }
 
 /////////////////
