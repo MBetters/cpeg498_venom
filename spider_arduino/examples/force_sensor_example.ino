@@ -22,7 +22,7 @@ void loop() {
   delay(100);
 }
 
-void int getSensorRead(unsigned int SensorPinNumber)
+void getSensorRead(unsigned int SensorPinNumber)
 {
   if (SensorPinNumber == 14)
   {
