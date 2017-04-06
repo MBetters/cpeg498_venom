@@ -180,6 +180,8 @@ void loop() {
     else if (ch == 'w') {
       Serial.println("Received 'move forward' command");
       spiderStates = (LEG_STATE**) spiderStates_WALK_FORWARD;
+      currentSpiderState = (LEG_STATE*) spiderStates_WALK_FORWARD[0];
+      nextSpiderState = (LEG_STATE*) spiderStates_WALK_FORWARD[1];
       numberOfSpiderStates = 6;
     }
     else if (ch == 's') {
@@ -200,16 +202,16 @@ void loop() {
     else if (ch == 'x') {
       turnOff();
     }
-    //Reset the PWMValuesIndex to zero.
+    //Reset the spiderStatesIndex to zero.
     spiderStatesIndex = 0;
   }
 
   //If the spiderStatesIndex hasn't reached the end of the 2D spiderStates array,
   //then keep running the action described by spiderStates.
   if (spiderStatesIndex < numberOfSpiderStates) {
-    //Move every leg
     bool nextLegStatesHaveBeenReached[6] = {false, false, false, false, false, false};
     unsigned int legIndex = 0;
+    //Move every leg
     for (legIndex = 0; legIndex < 6; legIndex++) {
       LEG_STATE currentLegState = currentSpiderState[legIndex];
       LEG_STATE nextLegState = nextSpiderState[legIndex];
@@ -297,6 +299,7 @@ bool moveLeg(unsigned int legIndex, LEG_STATE currentState, LEG_STATE nextState)
   String legName = legNames[legIndex];
   String currentStateName = getStateName(currentState);
   String nextStateName = getStateName(nextState);
+
   Serial.println("Moving the " + legName + " leg from the " + currentStateName + " state to the " + nextStateName + " state.");
 
   unsigned int shoulderServoPinNumber = getShoulderServoPinNumber(legName);
@@ -361,15 +364,13 @@ void PWMIncrement(unsigned int servoID) {
 //SECTION: Helper Functions
 ////////////////////////////
 String getStateName(LEG_STATE state) {
-  if (state == UP_FORWARD) {
-    return "UP_FORWARD";
-  } else if (state == UP_BACKWARD) {
-    return "UP_FORWARD";
-  } else if (state == DOWN_FORWARD) {
-    return "DOWN_FORWARD";
-  } else if (state == DOWN_BACKWARD) {
-    return "DOWN_BACKWARD";
+  switch (state) {
+    case UP_FORWARD: return "UP_FORWARD";
+    case UP_BACKWARD: return "UP_BACKWARD";
+    case DOWN_FORWARD: return "DOWN_FORWARD";
+    case DOWN_BACKWARD: return "DOWN_BACKWARD";
   }
+  return "THERE_IS_AN_ERROR"; //default return value
 }
 
 unsigned int getShoulderServoPinNumber(String legName) {
