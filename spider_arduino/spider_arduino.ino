@@ -1,6 +1,13 @@
+#include <math.h>
+
 ////////////////////////////////////////////////////////////////
 //SECTION: Pin-Number-Related and Name-Related Global Variables
 ////////////////////////////////////////////////////////////////
+
+//k is the rotational proportionality constant
+unsigned int k[6];
+unsigned int t[6] = {100, 100, 300, 300, 300, 300};
+unsigned int center[6] = {450, 450, 600, 600, 680, 680};
 
 unsigned int FLS = 32; //front-left shoulder pin number
 unsigned int FLE = 21; //front-left elbow pin number
@@ -160,6 +167,11 @@ void setup() {
   //runTests(); //Comment this out in production, so that it doesn't run.
 
   turnOn();
+
+  // Set rotational proportionality constants
+  for (int i=0; i < 6; i++) {
+    k[i] = (2/M_PI) * (1000 + t[i] - center[i]);
+  };
   
   Serial.println("setup done");
 }
@@ -297,8 +309,8 @@ bool moveLeg(unsigned int legIndex, LEG_STATE currentState, LEG_STATE nextState)
   String legName = legNames[legIndex];
   String currentStateName = getStateName(currentState);
   String nextStateName = getStateName(nextState);
-  Serial.println("Moving the " + legName + " leg from the " + currentStateName + " state to the " + nextStateName + " state.");
-
+  //Serial.println("Moving the " + legName + " leg from the " + currentStateName + " state to the " + nextStateName + " state.");
+  Serial.println("Hi");
   unsigned int shoulderServoPinNumber = getShoulderServoPinNumber(legName);
   unsigned int elbowServoPinNumber = getElbowServoPinNumber(legName);
 
