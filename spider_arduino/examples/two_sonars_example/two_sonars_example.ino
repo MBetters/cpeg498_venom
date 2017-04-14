@@ -1,12 +1,13 @@
+//For the echo and trigger pins can be any pin, just changed the value according to what pins are available.
 //Sonar 1
-int echoPin1 =13;
-int initPin1 =12;
-int distance1 =0;
+unsigned int echoPin1 =13;
+unsigned int initPin1 =12;
+ unsigned int distance1 =0;
 
 //Sonar 2
-int echoPin2 =8;
-int initPin2 =7;
-int distance2 =0;
+ unsigned int echoPin2 =8;
+unsigned int initPin2 =7;
+ unsignedint distance2 =0;
 
 void setup() {
   
@@ -20,7 +21,6 @@ void setup() {
 }
 
 void loop() {
-  
   distance1 = getDistance(initPin1, echoPin1);
   printDistance(1, distance1);
   delay(150);
@@ -28,15 +28,11 @@ void loop() {
   distance2 = getDistance(initPin2, echoPin2);
   printDistance(2, distance2);
   delay(150);
-
   Serial.println(" ");
- 
-
-  delay(500);
   
 }
 
-int getDistance (int initPin, int echoPin){
+unsigned int getDistance (int initPin, int echoPin){
 
  digitalWrite(initPin, HIGH);
  delayMicroseconds(10); 
