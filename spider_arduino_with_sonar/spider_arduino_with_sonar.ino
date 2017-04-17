@@ -15,15 +15,15 @@ unsigned int MLE = 23; //middle-left elbow
 unsigned int MRS = 5; //middle-right shoulder
 unsigned int MRE = 3; //middle-right elbow
 
-//The echo and trigger pins can be any pin, just changed the value according to what pins are available.
+//The echo and trigger pins will be the digital pin outs 27-30 (Pins can be found on the bottom side of the Teensy).
 //Sonar 1
-unsigned int echoPin1 = 13;
-unsigned int initPin1 = 12;
+unsigned int echoPin1 = 27;
+unsigned int initPin1 = 28; //Trigger Pin
 unsigned int distance1 = 0;
 
 //Sonar 2
-unsigned int echoPin2 = 8;
-unsigned int initPin2 = 7;
+unsigned int echoPin2 = 29;
+unsigned int initPin2 = 30; //Trigger Pin
 unsigned int distance2 = 0;
 
 unsigned int servoPinNumbers[] = {FLS, FLE, 
