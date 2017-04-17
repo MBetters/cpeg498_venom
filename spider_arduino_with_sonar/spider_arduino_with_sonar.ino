@@ -15,7 +15,9 @@ unsigned int MLE = 23; //middle-left elbow
 unsigned int MRS = 5; //middle-right shoulder
 unsigned int MRE = 3; //middle-right elbow
 
-//The echo and trigger pins will be the digital pin outs 27-30 (Pins can be found on the bottom side of the Teensy).
+//The echo and trigger pins will be the digital pin outs 27-30 (Pins can be found on the top, but they are solder pads).
+// Wire color code
+// Black - Ground     Green - Echo      Blue - Trigger      Red - Vcc
 //Sonar 1
 unsigned int echoPin1 = 27;
 unsigned int initPin1 = 28; //Trigger Pin
