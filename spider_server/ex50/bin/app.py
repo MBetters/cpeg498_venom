@@ -1,12 +1,16 @@
 import web
 from web import form
 import json
+import os
+import shutil
 
 urls = (
     '/', 'index',
     '/js/(.*)', 'js',
 	'/update_action', 'update_action',
-	'/info', 'info'
+	'/info', 'info',
+	'/images/(.*)', 'images',
+	'/update_img', 'update_img'
 )
 
 app = web.application(urls, globals())
@@ -37,6 +41,36 @@ class update_action:
         #      the index page using the https protocol explicitly,
         #      since Status 303 redirects default to using http
         raise web.seeother('https://cpeg498-spider-mbetters.c9users.io/')
+        
+class images:
+    def GET(self, img_name):
+        img_ext = img_name.split(".")[-1]
+
+        cType = {
+            "png":"images/png",
+            "jpg":"images/jpeg",
+            "gif":"images/gif",
+            "ico":"images/x-icon"}
+
+        if img_name in os.listdir('images'):
+            web.header("Content-Type", cType[img_ext])
+            return open('images/%s' % img_name, "rb").read()
+        else:
+            raise web.notfound()
+        
+class update_img:
+    def POST(self):
+        print "update_img"
+        img_data = web.input()['img']
+        #print img_data
+        #print "$$$$$$$$$$$$$$$$$$$$$$$"
+        with open('images/latest.jpg', 'wb') as img:
+            #This isn't working.
+            #Try http://stackoverflow.com/questions/6728077/convert-python-str-unicode-object-to-binary-hex-blob
+            #instead???
+            img.write(img_data)
+        #TODO: Change the next line to a POST-success status code, to be faster.
+        raise web.seeother('https://cpeg498-spider-mbetters.c9users.io/')
 
 def get_dict_with_stringified_keys(dictionary):
     dict_to_return = {}
@@ -53,5 +87,5 @@ class info:
         return json.dumps(latest_info)
 
 if __name__=="__main__":
-    web.internalerror = web.debugerror
+    #web.internalerror = web.debugerror
     app.run()
