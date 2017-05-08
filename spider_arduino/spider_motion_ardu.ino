@@ -14,6 +14,14 @@ unsigned int MLE = 23; //middle-left elbow
 unsigned int MRS = 5; //middle-right shoulder
 unsigned int MRE = 3; //middle-right elbow
 
+// Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
+// Possible pins for each force sensor: 14, 16, 17, 19
+unsigned int fsrFLL = 14; // FSR for Front Left Leg
+unsigned int fsrBLL = 16; // Back Left Leg 
+unsigned int fsrFRL = 17; // Front Right Leg
+unsigned int fsrBRL = 19; // Back Right Leg
+
+
 unsigned int servoPinNumbers[] = {FLS, FLE, 
                                   FRS, FRE,
                                   BLS, BLE,
@@ -271,6 +279,11 @@ void loop() {
     //If the end of the action sequence has been reached, start over and repeat until new command is received.
     PWMValuesIndex = 0;
   }
+
+  getSensorRead(fsrFLL); // Gets sensor reading for FLL and outputs its respective value.
+  getSensorRead(fsrBRL);
+  getSensorRead(fsrFRL);
+  getSensorRead(fsrBRL);
 }
 
 //////////////////////////////
@@ -407,4 +420,32 @@ void testPWMPin(unsigned int PWMPinNumber) {
     i = i + 1;
     delay(1);
   }
+}
+
+/////////////////
+//SECTION: Force
+/////////////////
+unsigned int getSensorRead(unsigned int SensorPinNumber)
+{
+  if (SensorPinNumber == 14)
+  {
+    Serial.print("FLL reading = ");
+    Serial.println(analogRead(SensorPinNumber));
+  }
+  else if (SensorPinNumber == 16)
+  {
+    Serial.print("BLL reading = ");
+    Serial.println(analogRead(SensorPinNumber));
+  }
+  else if (SensorPinNumber == 17)
+  {
+    Serial.print("FRL reading = ");
+    Serial.println(analogRead(SensorPinNumber));
+  }
+  else if (SensorPinNumber == 19)
+  {
+    Serial.print("BRL reading = ");
+    Serial.println(analogRead(SensorPinNumber));
+  }
+  
 }
