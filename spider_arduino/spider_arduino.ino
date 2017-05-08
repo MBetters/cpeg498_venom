@@ -306,6 +306,9 @@ bool moveLeg(unsigned int legIndex, LEG_STATE currentState, LEG_STATE nextState)
   unsigned int shoulderServoIndex = getShoulderServoIndex(legName);
   unsigned int elbowServoIndex = getElbowServoIndex(legName);
 
+  unsigned int shoulderServoPinNumber = servoPinNumbers[shoulderServoIndex];
+  unsigned int elbowServoPinNumber = servoPinNumbers[elbowServoIndex];
+
   //TODO: Implement the bodies of these conditionals.
   if (currentState == UP_FORWARD && nextState == UP_BACKWARD) {
     //Interpolate and move the leg accordingly
