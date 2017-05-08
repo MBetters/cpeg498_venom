@@ -15,7 +15,7 @@ unsigned int MRS = 5; //middle-right shoulder
 unsigned int MRE = 3; //middle-right elbow
 
 // Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
-// Possible pins for each force sensor: 14, 16, 17, 19
+// Possible pins for each force sensor: 14, 15, 16, 17, 18, 19
 unsigned int fsrFLL = 14; // FSR for Front Left Leg
 unsigned int fsrBLL = 16; // Back Left Leg 
 unsigned int fsrFRL = 17; // Front Right Leg
@@ -272,7 +272,7 @@ void loop() {
     //Increment PWMValuesIndex
     PWMValuesIndex++;
   } else if (!compareArray(currentPos, desiredPos)) {
-    PWMIncrement();
+    //PWMIncrement();
     //Have a small delay before the next call to loop()
     delay(4);
   } else {
@@ -280,7 +280,7 @@ void loop() {
     PWMValuesIndex = 0;
   }
 
-  getSensorRead(fsrFLL); // Gets sensor reading for FLL and outputs its respective value.
+   getSensorRead(fsrFLL); // Gets sensor reading for FLL and outputs its respective value.
   getSensorRead(fsrBRL);
   getSensorRead(fsrFRL);
   getSensorRead(fsrBRL);
@@ -290,7 +290,7 @@ void loop() {
 //SECTION: Movement Functions
 //////////////////////////////
 
-void PWMIncrement() {
+/*void PWMIncrement() {
   int val = analogRead(0);
   Serial.print("analog 0 is: ");
   Serial.println(val);
@@ -303,7 +303,7 @@ void PWMIncrement() {
     // Near the end, numbers may need to be rounded so they perfectly end up where they should
     if (abs(nextProportionalPWMValue - desiredPos[servoID]) < abs(stepSize)) {
       nextProportionalPWMValue = desiredPos[servoID];
-    }
+    }*/
     //Get the actual PWM value
     unsigned int PWMValue = translateBounds(servoID, (int) nextProportionalPWMValue);
     //Update what our current PWM output is for this servo
@@ -421,6 +421,7 @@ void testPWMPin(unsigned int PWMPinNumber) {
     delay(1);
   }
 }
+
 
 /////////////////
 //SECTION: Force
