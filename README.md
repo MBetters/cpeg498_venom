@@ -8,5 +8,4 @@ Hola. This is a UD capstone design repo for a robot spider. AKA Project Venom.
 - spider_body: this is STL files for 3D-printing the spider
 
 # Summary
-spider_server -> spider_raspberry_pi -> spider_arduino -> leg servos
-            (WiFi)              (Serial USB)  (PWM signals over wires)
+spider_server <-(WiFi)-> spider_raspberry_pi <-(USB)-> spider_arduino <-PWM-> leg servos
