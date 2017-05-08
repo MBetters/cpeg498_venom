@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<title>CPEG498 Project Venom: Controller</title>
+		<script src="js/jquery-3.1.1.js"></script>
+	</head>
+	<body>
+		<form id="action_form">
+		  <input type="radio" name="action_form_radio_button" value="w"/>forward<br/>
+		  <input type="radio" name="action_form_radio_button" value="s"/>backward<br/>
+		  <input type="radio" name="action_form_radio_button" value="a"/>left<br/>
+		  <input type="radio" name="action_form_radio_button" value="d"/>right<br/>
+		  <input type="radio" name="action_form_radio_button" value="c"/>turn CW<br/>
+		  <input type="radio" name="action_form_radio_button" value="v"/>turn CCW<br/>
+		  <input type="radio" name="action_form_radio_button" value="e"/>explore the room<br/>
+		  <input type="radio" name="action_form_radio_button" value="q">stand</input>
+		</form>
+		<button id="action_form_submit_button">Submit</button>
+		
+		<h1>Current action: <span id="latest_action"></span></h1>
+		
+		<script src="js/index.js"></script>
+	</body>
+</html>

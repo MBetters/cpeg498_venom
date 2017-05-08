@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# ['/usr/local/bin/mod_wsgi-express', 'start-server', '--entry-point=bin/app.py', '--host=128.4.25.156', '--port=80', '--user=mgula', '--document-root=/opt/spider_server/static', '--working-directory=/opt/spider_server/bin', '--server-root=/opt/spider_server', '--log-level=info', '--python-path=/opt/spider_server/venv/lib/python2.7/site-packages', '--setup-only']
+
+HTTPD="/home/mgula/.local/lib/python2.7/site-packages/mod_wsgi_packages/httpd/bin/httpd"
+HTTPD_ARGS="-f /opt/spider_server/httpd.conf -DMOD_WSGI_WITH_LISTENER_HOST -DMOD_WSGI_WITH_PYTHON_PATH -DMOD_WSGI_MPM_ENABLE_EVENT_MODULE -DMOD_WSGI_MPM_EXISTS_EVENT_MODULE -DMOD_WSGI_MPM_EXISTS_WORKER_MODULE -DMOD_WSGI_MPM_EXISTS_PREFORK_MODULE"
+
+HTTPD_COMMAND="$HTTPD $HTTPD_ARGS"
+
+MOD_WSGI_MODULES_DIRECTORY="/home/mgula/.local/lib/python2.7/site-packages/mod_wsgi_packages/httpd/modules"
+export MOD_WSGI_MODULES_DIRECTORY
+
+SHLIBPATH="/home/mgula/.local/lib/python2.7/site-packages/mod_wsgi_packages/httpd/lib"
+
+if [ "x$SHLIBPATH" != "x" ]; then
+    LD_LIBRARY_PATH="$SHLIBPATH:$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH
+fi
+
+MOD_WSGI_SERVER_ROOT="/opt/spider_server"
+
+export MOD_WSGI_SERVER_ROOT
+
+MOD_WSGI_LISTENER_HOST="128.4.25.156"
+
+export MOD_WSGI_LISTENER_HOST
+
+MOD_WSGI_HTTP_PORT="80"
+MOD_WSGI_HTTPS_PORT="None"
+
+export MOD_WSGI_HTTP_PORT
+export MOD_WSGI_HTTPS_PORT
+
+WSGI_RUN_USER="${WSGI_RUN_USER:-mgula}"
+WSGI_RUN_GROUP="${WSGI_RUN_GROUP:-root}"
+
+MOD_WSGI_USER="${MOD_WSGI_USER:-${WSGI_RUN_USER}}"
+MOD_WSGI_GROUP="${MOD_WSGI_GROUP:-${WSGI_RUN_GROUP}}"
+
+export MOD_WSGI_USER
+export MOD_WSGI_GROUP
+
+if [ `id -u` = "0" -a ${MOD_WSGI_USER} = "root" ]; then
+    cat << EOF
+
+WARNING: When running as the 'root' user, it is required that the options
+'--user' and '--group' be specified to mod_wsgi-express. These should
+define a non 'root' user and group under which the Apache child worker
+processes and mod_wsgi daemon processes should be run. Failure to specify
+these options will result in Apache and/or the mod_wsgi daemon processes
+failing to start. See the mod_wsgi-express documentation for further
+information on this restriction.
+
+EOF
+
+fi
+
+MOD_WSGI_WORKING_DIRECTORY="/opt/spider_server/bin"
+
+export MOD_WSGI_WORKING_DIRECTORY
+
+LANG='en_US.UTF-8'
+LC_ALL='en_US.UTF-8'
+
+export LANG
+export LC_ALL
+
+ACMD="$1"
+ARGV="$@"
+
+if test -f /opt/spider_server/envvars; then
+    . /opt/spider_server/envvars
+fi
+
+STATUSURL="http://128.4.25.156:80/server-status"
+
+if [ "x$ARGV" = "x" ]; then
+    ARGV="-h"
+fi
+
+GDB="gdb"
+ENABLE_GDB="False"
+
+PROCESS_NAME="httpd (mod_wsgi-express)"
+
+case $ACMD in
+start|stop|restart|graceful|graceful-stop)
+    if [ "x$ENABLE_GDB" != "xTrue" ]; then
+        exec -a "$PROCESS_NAME" $HTTPD_COMMAND -k $ARGV
+    else
+        echo "run $HTTPD_ARGS -k $ARGV" > /opt/spider_server/gdb.cmds
+        gdb -x /opt/spider_server/gdb.cmds $HTTPD
+    fi
+    ;;
+configtest)
+    exec $HTTPD_COMMAND -t
+    ;;
+status)
+    exec /usr/bin/python -m webbrowser -t $STATUSURL
+    ;;
+*)
+    exec $HTTPD_COMMAND $ARGV
+esac
+
