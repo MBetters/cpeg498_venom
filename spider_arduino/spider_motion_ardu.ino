@@ -66,7 +66,7 @@ unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {8000, 3800},
                                            {1680, 5600},
                                            {1450, 4500},
-                                           {8450, 3200}};
+                                           {8450, 3000}};
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
@@ -98,6 +98,23 @@ unsigned int PWMValuesStand[12][1] = {
   {DOWN     },
   {CENTEr[2]},
   {DOWN     }
+};
+
+unsigned int CROUCH_ARRAY_LENGTH = 1;
+unsigned int CROUCH_SPEED = 100;
+unsigned int PWMValuesCrouch[12][1] = {
+  {CENTEr[0]},
+  {UP       },
+  {CENTEr[0]},
+  {UP       },
+  {CENTEr[1]},
+  {UP       },
+  {CENTEr[1]},
+  {UP       },
+  {CENTEr[2]},
+  {UP       },
+  {CENTEr[2]},
+  {UP       }
 };
 
 unsigned int WALK_SPEED = 100;
@@ -198,7 +215,7 @@ void loop() {
     //Here, the Arduino reads serial USB input, 
     //which will be commands (in the form of characters) coming from the RaspberryPi.
     //To test these serial inputs out on a computer, use Tools->Serial Monitor.
-    if (ch == 'q') {
+    if (ch == 's') {
       Serial.println("Received 'stand up' command");
       for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesStand[i];
       numberOfPWMValues = STAND_ARRAY_LENGTH;
@@ -216,23 +233,11 @@ void loop() {
       numberOfPWMValues = JUMP_ARRAY_LENGTH;
       SPEED = JUMP_SPEED;
     }
-    else if (ch == 's') {
-      Serial.println("Received 'move backward' command");
-    }
-    else if (ch == 'a') {
-      Serial.println("Received 'sidestep left' command");
-    }
-    else if (ch == 'd') {
-      Serial.println("Received 'sidestep right' command");
-    }
     else if (ch == 'c') {
-      Serial.println("Received 'turn CW' command");
-    }
-    else if (ch == 'v') {
-      Serial.println("Received 'turn CCW' command");
-    }
-    else if (ch == 'x') {
-      turnOff();
+      Serial.println("Received 'crouch' command");
+      for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesCrouch[i];
+      numberOfPWMValues = CROUCH_ARRAY_LENGTH;
+      SPEED = CROUCH_SPEED;
     }
     //Reset the PWMValuesIndex to zero.
     PWMValuesIndex = 0;
