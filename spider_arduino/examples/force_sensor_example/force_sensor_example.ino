@@ -1,5 +1,5 @@
 
- // Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
+// Current pins being used by servos: 3, 4, 5, 6, 9, 10, 20, 21, 22, 23, 25, 32
 // Possible pins for each force sensor: 14, 15, 16, 17, 18, 19
 unsigned int fsrFLL = 14; // FSR for Front Left Leg
 unsigned int fsrBLL = 16; // Back Left Leg 
