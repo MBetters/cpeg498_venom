@@ -9,4 +9,5 @@ Hola. This is a UD capstone design repo for a robot spider. AKA Project Venom.
 
 # Summary
 spider_server -> spider_raspberry_pi -> spider_arduino -> leg servos
+
             (WiFi)              (Serial USB)  (PWM signals over wires)
