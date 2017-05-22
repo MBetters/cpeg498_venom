@@ -21,7 +21,6 @@ unsigned int fsrBLL = 16; // Back Left Leg
 unsigned int fsrFRL = 17; // Front Right Leg
 unsigned int fsrBRL = 19; // Back Right Leg
 
-
 unsigned int servoPinNumbers[] = {FLS, FLE, 
                                   FRS, FRE,
                                   BLS, BLE,
@@ -68,13 +67,13 @@ unsigned int servoPWMValueBounds[12][2] = {{8600, 2200},
                                            {1790, 7700},
                                            {7410, 2750},
                                            {8500, 3800},
-                                           {1970, 6100},
+                                           {1970, 6300},
                                            {2000, 6500},
                                            {8080, 3700},
                                            {8000, 3800},
                                            {1680, 5600},
                                            {1450, 4500},
-                                           {8450, 3000}};
+                                           {8450, 3800}};
 
 unsigned int PWMMin = 3277;
 unsigned int PWMMax = 6553;
@@ -86,10 +85,27 @@ unsigned int PWMValuesIndex = 0;
 unsigned int numberOfPWMValues = 0;
 
 unsigned int DOWN = 200;
-unsigned int UP = 500;
+unsigned int UP = 600;
 unsigned int FORWARD[3] = {700, 450, 700};
 unsigned int CENTEr[3] = {600, 350, 600};
 unsigned int BACK[3] = {500, 250, 500};
+
+unsigned int WALK_SPEED = 100;
+unsigned int WALK_ARRAY_LENGTH = 6;
+unsigned int PWMValuesWalk[12][6] = {
+  {FORWARD[0], FORWARD[0], FORWARD[0], BACK[0]   , BACK[0]   , BACK[0]   }, //FLS >>><<<
+  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }, //FLE -____-
+  {BACK[0]   , BACK[0]   , BACK[0]   , FORWARD[0], FORWARD[0], FORWARD[0]}, //FRS <<<>>>
+  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //FRE __--__
+  {FORWARD[1], FORWARD[1], FORWARD[1], BACK[1]   , BACK[1]   , BACK[1]   }, //BLS >>><<<
+  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }, //BLE -____-
+  {BACK[1]   , BACK[1]   , BACK[1]   , FORWARD[1], FORWARD[1], FORWARD[1]}, //BRS <<<>>>
+  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //BRE __--__
+  {BACK[2]   , BACK[2]   , BACK[2]   , FORWARD[2], FORWARD[2], FORWARD[2]}, //MLS <<<>>>
+  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //MLE __--__
+  {FORWARD[2], FORWARD[2], FORWARD[2], BACK[2]   , BACK[2]   , BACK[2]   }, //MRS >>><<<
+  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }  //MRE -____-
+};
 
 unsigned int STAND_ARRAY_LENGTH = 1;
 unsigned int STAND_SPEED = 100;
@@ -112,34 +128,34 @@ unsigned int CROUCH_ARRAY_LENGTH = 1;
 unsigned int CROUCH_SPEED = 100;
 unsigned int PWMValuesCrouch[12][1] = {
   {CENTEr[0]},
-  {UP       },
+  {UP - 200 },
   {CENTEr[0]},
-  {UP       },
+  {UP - 200 },
   {CENTEr[1]},
-  {UP       },
+  {UP - 200 },
   {CENTEr[1]},
-  {UP       },
+  {UP - 200 },
   {CENTEr[2]},
-  {UP       },
+  {UP - 200 },
   {CENTEr[2]},
-  {UP       }
+  {UP - 200 },
 };
 
-unsigned int WALK_SPEED = 100;
-unsigned int WALK_ARRAY_LENGTH = 6;
-unsigned int PWMValuesWalk[12][6] = {
-  {FORWARD[0], FORWARD[0], FORWARD[0], BACK[0]   , BACK[0]   , BACK[0]   }, //FLS >>><<<
-  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }, //FLE -____-
-  {BACK[0]   , BACK[0]   , BACK[0]   , FORWARD[0], FORWARD[0], FORWARD[0]}, //FRS <<<>>>
-  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //FRE __--__
-  {FORWARD[1], FORWARD[1], FORWARD[1], BACK[1]   , BACK[1]   , BACK[1]   }, //BLS >>><<<
-  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }, //BLE -____-
-  {BACK[1]   , BACK[1]   , BACK[1]   , FORWARD[1], FORWARD[1], FORWARD[1]}, //BRS <<<>>>
-  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //BRE __--__
-  {BACK[2]   , BACK[2]   , BACK[2]   , FORWARD[2], FORWARD[2], FORWARD[2]}, //MLS <<<>>>
-  {DOWN      , DOWN      , UP        , UP        , DOWN      , DOWN      }, //MLE __--__
-  {FORWARD[2], FORWARD[2], FORWARD[2], BACK[2]   , BACK[2]   , BACK[2]   }, //MRS >>><<<
-  {UP        , DOWN      , DOWN      , DOWN      , DOWN      , UP        }  //MRE -____-
+unsigned int TALL_ARRAY_LENGTH = 1;
+unsigned int TALL_SPEED = 100;
+unsigned int PWMValuesTall[12][1] = {
+  {CENTEr[0]},
+  {DOWN - 100 },
+  {CENTEr[0]},
+  {DOWN - 100 },
+  {CENTEr[1]},
+  {DOWN - 100 },
+  {CENTEr[1]},
+  {DOWN - 100 },
+  {CENTEr[2]},
+  {DOWN - 100 },
+  {CENTEr[2]},
+  {DOWN - 100 },
 };
 
 unsigned int JUMP_ARRAY_LENGTH = 7;
@@ -208,9 +224,9 @@ void setup() {
   
   //turnOn();
   //TO START OUT WALKING:
-  //for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesWalk[i];
-  //    numberOfPWMValues = WALK_ARRAY_LENGTH;
-  //    SPEED = WALK_SPEED;
+  for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesWalk[i];
+      numberOfPWMValues = WALK_ARRAY_LENGTH;
+      SPEED = WALK_SPEED;
   
   Serial.println("setup done");
 }
@@ -247,6 +263,12 @@ void loop() {
       numberOfPWMValues = CROUCH_ARRAY_LENGTH;
       SPEED = CROUCH_SPEED;
     }
+    else if (ch == 't') {
+      Serial.println("Received 'tall' command");
+      for (int i=0; i < 12; i++) PWMValues[i] = PWMValuesTall[i];
+      numberOfPWMValues = TALL_ARRAY_LENGTH;
+      SPEED = TALL_SPEED;
+    }
     //Reset the PWMValuesIndex to zero.
     PWMValuesIndex = 0;
   }
@@ -274,12 +296,11 @@ void loop() {
   } else if (!compareArray(currentPos, desiredPos)) {
     PWMIncrement();
     //Have a small delay before the next call to loop()
-    delay(4);
+    delay(2);
   } else {
     //If the end of the action sequence has been reached, start over and repeat until new command is received.
     PWMValuesIndex = 0;
   }
-
   getSensorRead(fsrFLL); // Gets sensor reading for FLL and outputs its respective value.
   getSensorRead(fsrBRL);
   getSensorRead(fsrFRL);
@@ -304,10 +325,14 @@ void PWMIncrement() {
     if (abs(nextProportionalPWMValue - desiredPos[servoID]) < abs(stepSize)) {
       nextProportionalPWMValue = desiredPos[servoID];
     }
-    //Get the actual PWM value
-    unsigned int PWMValue = translateBounds(servoID, (int) nextProportionalPWMValue);
     //Update what our current PWM output is for this servo
     currentPos[servoID] = nextProportionalPWMValue;
+    //If it's a shoulder, apply the trig calibration
+    if (servoID % 2 == 0) {
+      nextProportionalPWMValue = translateAngle(servoID, nextProportionalPWMValue);
+    }
+    //Get the actual PWM value
+    unsigned int PWMValue = translateBounds(servoID, (int) nextProportionalPWMValue);
     //Get the servo pin number
     unsigned int servoPinNumber = servoPinNumbers[servoID];
     //Actuate the servo with the PWM value
@@ -335,6 +360,11 @@ void turnOn() {
     analogWrite(MLE, translateBounds(9, i));
     analogWrite(MRE, translateBounds(11, i));
   }
+}
+
+float translateAngle(int servoID, float PWMinput) {
+  float PWMout = (1000/M_PI) * asin((PWMinput - 500) / 500) + 500;
+  return PWMout;
 }
 
 void turnOff() {
@@ -403,23 +433,6 @@ unsigned int translateBounds(unsigned int servoIndex, int value) {
   }
   //Something is wrong, so program is effectively stopped here.
   while(1);
-}
-
-/////////////////
-//SECTION: Tests
-/////////////////
-void runTests() {
-  //This function runs one or more tests.
-  testPWMPin(10);
-}
-
-void testPWMPin(unsigned int PWMPinNumber) {
-  unsigned int i = PWMMin;
-  while (i < PWMMax) {
-    analogWrite(PWMPinNumber, i);
-    i = i + 1;
-    delay(1);
-  }
 }
 
 /////////////////
